@@ -231,7 +231,10 @@ This project is licensed under the MIT License.
 
 ## Author
 
-**Sanket Chaudhari**
+© 2026 Sanket Chaudhari
+
+This project is developed as an academic and portfolio project.
+Unauthorized plagiarism or direct submission as one's own academic work is prohibited.
 
 B.Tech Artificial Intelligence & Data Science
 
