@@ -28,7 +28,7 @@ from calculations import (
     calculate_total_emissions,
 )
 
-INPUT_FILE = "data/raw/institutional_dataset.csv"
+INPUT_FILE = "data/processed/cleaned_dataset.csv"
 OUTPUT_DIRECTORY = "outputs"
 OUTPUT_FILE = os.path.join(OUTPUT_DIRECTORY, "carbon_report.csv")
 
