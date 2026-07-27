@@ -77,10 +77,34 @@ def calculate_public_bus_emissions(passenger_km: float) -> float:
     """Calculate emissions from public bus transport."""
     return calculate_emission("public_bus", passenger_km)
 
+def calculate_motorcycle_emissions(passenger_km: float) -> float:
+    """Calculate emissions from motorcycle transport."""
+    return calculate_emission("motorcycle", passenger_km)
+
+
+def calculate_auto_rickshaw_emissions(passenger_km: float) -> float:
+    """Calculate emissions from auto-rickshaw transport."""
+    return calculate_emission("auto_rickshaw", passenger_km)
+
+
+def calculate_bicycle_emissions(passenger_km: float) -> float:
+    """Calculate emissions from bicycle transport."""
+    return calculate_emission("bicycle", passenger_km)
+
+
+def calculate_walking_emissions(passenger_km: float) -> float:
+    """Calculate emissions from walking."""
+    return calculate_emission("walking", passenger_km)
+
 
 def calculate_waste_emissions(waste_kg: float) -> float:
-    """Calculate emissions from municipal solid waste."""
-    return calculate_emission("waste", waste_kg)
+    """Calculate emissions from landfill waste."""
+    return calculate_emission("waste_landfill", waste_kg)
+
+
+def calculate_compost_waste_emissions(waste_kg: float) -> float:
+    """Calculate emissions from compost waste."""
+    return calculate_emission("compost_waste", waste_kg)
 
 
 def calculate_methane_emissions(methane_kg: float) -> float:
@@ -92,21 +116,29 @@ def calculate_nitrous_oxide_emissions(nitrous_oxide_kg: float) -> float:
     """Calculate nitrous oxide emissions."""
     return calculate_emission("nitrous_oxide", nitrous_oxide_kg)
 
+
 # ==========================================================
 # Total Emission Calculator
 # ==========================================================
 
-def calculate_total_emissions(scope1: float, scope2: float, scope3: float) -> float:
+def calculate_total_emissions(
+    scope1: float,
+    scope2: float,
+    scope3: float,
+) -> float:
     """
     Calculate total carbon emissions.
 
     Parameters:
-        scope1 (float): Scope 1 emissions
-        scope2 (float): Scope 2 emissions
-        scope3 (float): Scope 3 emissions
+        scope1 (float): Scope 1 emissions.
+        scope2 (float): Scope 2 emissions.
+        scope3 (float): Scope 3 emissions.
 
     Returns:
         float: Total carbon emissions.
     """
 
-    return round(scope1 + scope2 + scope3, 2)
+    return round(
+        scope1 + scope2 + scope3,
+        2,
+    )

@@ -23,7 +23,7 @@ from data_loader import load_dataset
 # Configuration
 # ==========================================================
 
-INPUT_FILE = "data/raw/institutional_dataset.csv"
+INPUT_FILE = "data/raw/carbonomics_institutional_dataset.csv"
 
 OUTPUT_DIRECTORY = "data/processed"
 
@@ -33,13 +33,22 @@ OUTPUT_FILE = os.path.join(
 )
 
 REQUIRED_COLUMNS = [
-    "Electricity_kWh",
-    "Generator_Diesel_L",
-    "Water_Consumption_kL",
-    "Waste_Generated_kg",
-    "College_Bus_Distance_km",
-    "Sewage_Generated_kL",
-    "Temperature_C",
+    "electricity_kwh",
+    "diesel_litres",
+    "petrol_distance_km",
+    "diesel_distance_km",
+    "ev_electricity_kwh",
+    "college_bus_distance_km",
+    "public_bus_passenger_km",
+    "motorcycle_passenger_km",
+    "auto_passenger_km",
+    "bicycle_passenger_km",
+    "walking_passenger_km",
+    "waste_landfill_kg",
+    "compost_waste_kg",
+    "water_consumption_m3",
+    "methane_kg",
+    "nitrous_oxide_kg",
 ]
 
 
@@ -104,7 +113,7 @@ def validate_numeric_columns(
     dataset: pd.DataFrame,
 ) -> None:
     """
-    Ensure required columns are numeric.
+    Ensure all required columns are numeric.
     """
 
     non_numeric = []
@@ -141,6 +150,7 @@ def validate_negative_values(
         raise ValueError(
             f"Negative values detected in: {negative_columns}"
         )
+
 # ==========================================================
 # Cleaning Pipeline
 # ==========================================================
@@ -180,6 +190,20 @@ def clean_dataset() -> None:
     dataset = remove_duplicates(
         dataset,
     )
+
+    # ==========================================================
+    # Standardize Column Names
+    # ==========================================================
+
+    dataset.columns = (
+        dataset.columns
+        .str.strip()
+        .str.lower()
+    )
+
+    # ==========================================================
+    # Export Clean Dataset
+    # ==========================================================
 
     os.makedirs(
         OUTPUT_DIRECTORY,

@@ -58,11 +58,46 @@ EMISSION_FACTORS = {
         "source": "DEFRA 2024"
     },
 
-    "waste": {
+    "motorcycle": {
+        "factor": 0.103,
+        "scope": "Scope 3",
+        "unit": "passenger-km",
+        "source": "DEFRA 2024"
+    },
+
+    "auto_rickshaw": {
+        "factor": 0.110,
+        "scope": "Scope 3",
+        "unit": "passenger-km",
+        "source": "DEFRA 2024"
+    },
+
+    "bicycle": {
+        "factor": 0.0,
+        "scope": "Scope 3",
+        "unit": "passenger-km",
+        "source": "Zero Emission"
+    },
+
+    "walking": {
+        "factor": 0.0,
+        "scope": "Scope 3",
+        "unit": "passenger-km",
+        "source": "Zero Emission"
+    },
+
+    "waste_landfill": {
         "factor": 1.90,
         "scope": "Scope 3",
         "unit": "kg",
         "source": "IPCC 2006"
+    },
+
+    "compost_waste": {
+        "factor": 0.10,
+        "scope": "Scope 3",
+        "unit": "kg",
+        "source": "IPCC Guidelines"
     },
 
     "methane": {

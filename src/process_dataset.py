@@ -4,7 +4,7 @@ process_dataset.py
 Carbonomics-AI Dataset Processing Module
 
 This module:
-1. Loads the institutional dataset.
+1. Loads the cleaned institutional dataset.
 2. Calculates carbon emissions for each record.
 3. Computes Scope 1, Scope 2, Scope 3, and Total emissions.
 4. Exports the processed dataset as a CSV report.
@@ -22,15 +22,25 @@ from calculations import (
     calculate_ev_transport_emissions,
     calculate_college_bus_emissions,
     calculate_public_bus_emissions,
+    calculate_motorcycle_emissions,
+    calculate_auto_rickshaw_emissions,
+    calculate_bicycle_emissions,
+    calculate_walking_emissions,
     calculate_waste_emissions,
+    calculate_compost_waste_emissions,
     calculate_methane_emissions,
     calculate_nitrous_oxide_emissions,
     calculate_total_emissions,
 )
 
 INPUT_FILE = "data/processed/cleaned_dataset.csv"
+
 OUTPUT_DIRECTORY = "outputs"
-OUTPUT_FILE = os.path.join(OUTPUT_DIRECTORY, "carbon_report.csv")
+
+OUTPUT_FILE = os.path.join(
+    OUTPUT_DIRECTORY,
+    "carbon_report.csv",
+)
 
 
 def process_dataset():
@@ -64,10 +74,35 @@ def process_dataset():
         # Activity Data
         # -------------------------
 
-        electricity = row["Electricity_kWh"]
-        diesel = row["Generator_Diesel_L"]
-        college_bus = row["College_Bus_Distance_km"]
-        waste = row["Waste_Generated_kg"]
+        electricity = row["electricity_kwh"]
+
+        diesel = row["diesel_litres"]
+
+        petrol_distance = row["petrol_distance_km"]
+
+        diesel_distance = row["diesel_distance_km"]
+
+        ev_electricity = row["ev_electricity_kwh"]
+
+        college_bus = row["college_bus_distance_km"]
+
+        public_bus = row["public_bus_passenger_km"]
+
+        motorcycle = row["motorcycle_passenger_km"]
+
+        auto = row["auto_passenger_km"]
+
+        bicycle = row["bicycle_passenger_km"]
+
+        walking = row["walking_passenger_km"]
+
+        landfill_waste = row["waste_landfill_kg"]
+
+        compost_waste = row["compost_waste_kg"]
+
+        methane = row["methane_kg"]
+
+        nitrous_oxide = row["nitrous_oxide_kg"]
 
         # -------------------------
         # Individual Calculations
@@ -85,23 +120,75 @@ def process_dataset():
             college_bus
         )
 
-        waste_emission = calculate_waste_emissions(
-            waste
+        petrol_emission = calculate_petrol_transport_emissions(
+            petrol_distance
         )
 
-        # ----------------------------------------------------
-        # Future Modules (Dataset currently does not contain
-        # these columns. Keep as placeholders.)
-        # ----------------------------------------------------
+        diesel_transport_emission = (
+            calculate_diesel_transport_emissions(
+                diesel_distance
+            )
+        )
 
-        petrol_emission = 0.0
-        diesel_transport_emission = 0.0
-        ev_emission = 0.0
-        public_bus_emission = 0.0
-        methane_emission = 0.0
-        nitrous_oxide_emission = 0.0
+        ev_emission = calculate_ev_transport_emissions(
+            ev_electricity
+        )
 
-        # -------------------------
+        public_bus_emission = (
+            calculate_public_bus_emissions(
+                public_bus
+            )
+        )
+
+        motorcycle_emission = (
+            calculate_motorcycle_emissions(
+                motorcycle
+            )
+        )
+
+        auto_emission = (
+            calculate_auto_rickshaw_emissions(
+                auto
+            )
+        )
+
+        bicycle_emission = (
+            calculate_bicycle_emissions(
+                bicycle
+            )
+        )
+
+        walking_emission = (
+            calculate_walking_emissions(
+                walking
+            )
+        )
+
+        landfill_emission = (
+            calculate_waste_emissions(
+                landfill_waste
+            )
+        )
+
+        compost_emission = (
+            calculate_compost_waste_emissions(
+                compost_waste
+            )
+        )
+
+        methane_emission = (
+            calculate_methane_emissions(
+                methane
+            )
+        )
+
+        nitrous_oxide_emission = (
+            calculate_nitrous_oxide_emissions(
+                nitrous_oxide
+            )
+        )
+
+                # -------------------------
         # Scope Calculations
         # -------------------------
 
@@ -113,11 +200,16 @@ def process_dataset():
         scope2 = electricity_emission
 
         scope3 = (
-            waste_emission +
             petrol_emission +
             diesel_transport_emission +
             ev_emission +
             public_bus_emission +
+            motorcycle_emission +
+            auto_emission +
+            bicycle_emission +
+            walking_emission +
+            landfill_emission +
+            compost_emission +
             methane_emission +
             nitrous_oxide_emission
         )
@@ -150,7 +242,10 @@ def process_dataset():
     # Export Report
     # ==========================================================
 
-    os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
+    os.makedirs(
+        OUTPUT_DIRECTORY,
+        exist_ok=True,
+    )
 
     dataset.to_csv(
         OUTPUT_FILE,
@@ -167,7 +262,10 @@ def process_dataset():
 
 
 def main():
-    """Run dataset processing."""
+    """
+    Run dataset processing.
+    """
+
     process_dataset()
 
 
