@@ -123,10 +123,10 @@ Decision Support
 
 ### Phase 2 – Carbon Accounting
 
-- [ ] Carbon Emission Calculator
-- [ ] GHG Emission Factors
-- [ ] Dataset Integration
-- [ ] Carbon Footprint Report
+- [x] Carbon Emission Calculator
+- [x] GHG Emission Factors
+- [x] Dataset Integration
+- [x] Carbon Footprint Report
 
 ### Phase 3 – Machine Learning
 
@@ -231,7 +231,7 @@ This project is licensed under the MIT License.
 
 ## Author
 
-© 2026 Sanket Chaudhari
+© 2026 Sanket Chaudhari 
 
 This project is developed as an academic and portfolio project.
 Unauthorized plagiarism or direct submission as one's own academic work is prohibited.
