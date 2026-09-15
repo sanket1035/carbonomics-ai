@@ -22,3 +22,13 @@ CREATE TABLE IF NOT EXISTS cleaned_dataset (
     methane_kg DOUBLE PRECISION,
     nitrous_oxide_kg DOUBLE PRECISION
 );
+
+-- Table for ML Prediction Results
+CREATE TABLE IF NOT EXISTS prediction_results (
+    prediction_id SERIAL PRIMARY KEY,
+    actual_emission DOUBLE PRECISION,
+    predicted_emission DOUBLE PRECISION,
+    model_name VARCHAR(50),
+    prediction_error DOUBLE PRECISION,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
