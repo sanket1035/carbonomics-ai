@@ -130,11 +130,11 @@ Decision Support
 
 ### Phase 3 – Machine Learning
 
-- [ ] Data Preprocessing
-- [ ] Random Forest Model
-- [ ] XGBoost Model
-- [ ] Model Evaluation
-- [ ] Emission Forecasting
+- [x] Data Preprocessing
+- [x] Random Forest Model
+- [x] XGBoost Model
+- [x] Model Evaluation
+- [x] Emission Forecasting
 
 ### Phase 4 – Analytics
 
