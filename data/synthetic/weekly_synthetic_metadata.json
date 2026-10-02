@@ -1,0 +1,26 @@
+{
+  "label": "SYNTHETIC - calibrated to real monthly totals, NOT measured weekly data",
+  "real_source": "data/real/real_monthly_2025.csv",
+  "seed": 42,
+  "weeks": 52,
+  "first_week_start": "2025-01-01",
+  "left_out": "31 Dec 2025 (365th day does not fit in 52 full weeks)",
+  "assumptions": {
+    "electricity_weekday_weight": {
+      "Mon-Fri": 1.0,
+      "Sat": 0.7,
+      "Sun": 0.5
+    },
+    "electricity_noise_lognormal_sigma": 0.08,
+    "diesel_noise_lognormal_sigma": 0.6,
+    "diesel_weekday_effect": "none"
+  },
+  "real_annual_totals": {
+    "electricity_kwh": 1059147,
+    "dg_diesel_litres": 4100
+  },
+  "weekly_annual_totals": {
+    "electricity_kwh": 1056458.31,
+    "diesel_litres": 4095.15
+  }
+}

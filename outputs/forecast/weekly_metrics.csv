@@ -1,0 +1,9 @@
+target,model,train_weeks,test_weeks,MAE,RMSE,R2
+electricity_kwh,naive_last_week,38,10,832.115,931.8693,0.3583
+electricity_kwh,train_mean,38,10,2779.8176,3013.4107,-5.7102
+electricity_kwh,random_forest,38,10,1209.9882,1382.0531,-0.4115
+electricity_kwh,xgboost,38,10,1740.8689,2061.6541,-2.1409
+diesel_litres,naive_last_week,38,10,13.914,18.9535,-2.6551
+diesel_litres,train_mean,38,10,30.5336,32.1027,-9.4858
+diesel_litres,random_forest,38,10,18.3658,20.9962,-3.4854
+diesel_litres,xgboost,38,10,13.8296,18.2726,-2.3972

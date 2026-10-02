@@ -1,112 +1,25 @@
-# Carbonomics-AI Database Setup
+# Carbonomics-AI Database
 
-This folder contains the PostgreSQL database setup files for Module 2 of the Carbonomics-AI project.
+PostgreSQL storage for the weekly activity data, emissions and forecast results.
 
-## Database Details
-
-- **Database:** `carbonomics_db`
-- **PostgreSQL Version:** 18
-- **Database Tool:** pgAdmin 4
-- **Table:** `cleaned_dataset`
-- **Dataset:** `data/processed/cleaned_dataset.csv`
-- **Total Records:** 365
-- **Dataset Features:** 16
-
-## Dataset Features
-
-- electricity_kwh
-- diesel_litres
-- petrol_distance_km
-- diesel_distance_km
-- ev_electricity_kwh
-- college_bus_distance_km
-- public_bus_passenger_km
-- motorcycle_passenger_km
-- auto_passenger_km
-- bicycle_passenger_km
-- walking_passenger_km
-- waste_landfill_kg
-- compost_waste_kg
-- water_consumption_m3
-- methane_kg
-- nitrous_oxide_kg
-
-## Files
-
-- `schema.sql` - Creates the `cleaned_dataset` table.
-- `import.sql` - Imports the cleaned dataset into PostgreSQL.
-- `screenshots/` - Database setup and SQL verification screenshots.
+## Tables (`schema.sql`, safe to run repeatedly)
+- `weekly_activity`: one row per week (`week_start` is the key): electricity_kwh, diesel_litres,
+  `is_synthetic`, scope1_kg, scope2_kg, total_kg.
+- `forecast_results`: one row per week x target x model (key on all three): actual, predicted, abs_error.
 
 ## Setup
+1. Create a database (default name `carbonomics_db`).
+2. Set the variables from `.env.example`: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD.
+3. `pip install -r requirements.txt` (includes psycopg2-binary).
+4. `python scripts/run_pipeline.py`. The last step creates the tables if needed and upserts the
+   rows, so running it again does not duplicate anything. Without DB_PASSWORD the step is skipped
+   with a message.
+5. `python scripts/verify_db.py` prints row counts and sample rows.
 
-### 1. Create Database
-
-Create a PostgreSQL database named:
-
-```text
-carbonomics_db
-```
-
-### 2. Create Table
-
-Connect to `carbonomics_db` and execute:
-
-```text
-database/schema.sql
-```
-
-### 3. Import Dataset
-
-The cleaned dataset is available at:
-
-```text
-data/processed/cleaned_dataset.csv
-```
-
-Before executing `database/import.sql`, replace:
-
-```text
-ABSOLUTE_PATH_TO_PROJECT
-```
-
-with the absolute path of your local Carbonomics-AI project.
-
-Alternatively, use **pgAdmin → Import/Export Data** with the following settings:
-
-- Format: CSV
-- Header: Yes
-- Delimiter: `,`
-- Encoding: UTF-8
-
-## Verify Data
-
-Verify the total number of records:
-
-```sql
-SELECT COUNT(*) AS total_rows
-FROM cleaned_dataset;
-```
-
-**Expected Output**
-
-```text
-365
-```
-
-View sample records:
-
-```sql
-SELECT *
-FROM cleaned_dataset
-LIMIT 10;
-```
+Manual alternative: run `schema.sql`, then `import.sql` (replace `ABSOLUTE_PATH_TO_PROJECT`) or use
+pgAdmin Import/Export on `data/processed/weekly_clean.csv`. This fills activity only; the scope
+columns are filled by the pipeline.
 
 ## Status
-
-✅ PostgreSQL integration completed successfully.
-
-- Database created
-- Table schema configured
-- Cleaned dataset imported
-- 365 records verified
-- Ready for Module 3 (Machine Learning)
+Tested on a local PostgreSQL 16: 52 `weekly_activity` rows and 80 `forecast_results` rows, the same
+counts after a second run. Not tested against pgAdmin or a hosted database.
