@@ -10,6 +10,7 @@ Master pipeline for Carbonomics-AI (weekly flow).
    derive the weekly emission forecast = predicted activity x factor
 5. Plots and QA report
 6. PostgreSQL upsert (skipped if credentials are not configured)
+7. Export dashboard/public/data/dashboard.json for the web dashboard
 
 Usage (from anywhere):
     python scripts/run_pipeline.py
@@ -24,6 +25,7 @@ sys.path.append(os.path.join(ROOT, "scripts"))
 os.chdir(ROOT)
 
 import make_synthetic_weekly  # noqa: E402
+from dashboard_export import export_dashboard_data  # noqa: E402
 from clean_data import clean_dataset  # noqa: E402
 from database.db_manager import upsert_forecast_results, upsert_weekly_activity  # noqa: E402
 from ml.forecast_weekly import emission_forecast, run_weekly_forecast  # noqa: E402
@@ -37,16 +39,16 @@ def run_master_pipeline() -> None:
     print("                    CARBONOMICS-AI PIPELINE (WEEKLY)")
     print("=" * 75)
 
-    print("\n[STEP 1/6] Building weekly SYNTHETIC dataset from real monthly totals...")
+    print("\n[STEP 1/7] Building weekly SYNTHETIC dataset from real monthly totals...")
     make_synthetic_weekly.main()
 
-    print("\n[STEP 2/6] Validating weekly dataset...")
+    print("\n[STEP 2/7] Validating weekly dataset...")
     clean_dataset()
 
-    print("\n[STEP 3/6] Carbon accounting (activity x factor)...")
+    print("\n[STEP 3/7] Carbon accounting (activity x factor)...")
     process_dataset()
 
-    print("\n[STEP 4/6] Weekly activity forecast with baselines...")
+    print("\n[STEP 4/7] Weekly activity forecast with baselines...")
     metrics_df, preds = run_weekly_forecast()
     for target, pred_df in preds.items():
         plot_forecast(pred_df, target)
@@ -54,12 +56,15 @@ def run_master_pipeline() -> None:
     emission_table, emission_metrics = emission_forecast(preds)
     plot_emission_forecast(emission_table)
 
-    print("\n[STEP 5/6] QA report...")
+    print("\n[STEP 5/7] QA report...")
     qa_path = generate_qa_report()
 
-    print("\n[STEP 6/6] PostgreSQL...")
+    print("\n[STEP 6/7] PostgreSQL...")
     db_activity = upsert_weekly_activity()
     db_forecast = upsert_forecast_results()
+
+    print("\n[STEP 7/7] Exporting dashboard data...")
+    export_dashboard_data()
 
     print("\n" + "=" * 75)
     print("PIPELINE FINISHED")
