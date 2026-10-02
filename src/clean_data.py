@@ -1,14 +1,14 @@
 """
 clean_data.py
 
-Carbonomics-AI Dataset Cleaning & Validation Module
+Carbonomics-AI weekly dataset validation module.
 
-This module:
-1. Loads the raw institutional dataset.
-2. Validates dataset structure and quality.
-3. Checks for missing values, duplicates, negative values,
-   required columns, and numeric data types.
-4. Exports a validated dataset as cleaned_dataset.csv.
+Loads the weekly activity dataset, checks structure and quality, and exports a
+validated copy to data/processed/weekly_clean.csv.
+
+Checks: required columns, missing values, numeric types, negative values,
+duplicate rows, strictly increasing weekly dates (7-day steps).
+Nothing is imputed or invented: a failed check raises an error.
 """
 
 import os
@@ -18,232 +18,85 @@ import pandas as pd
 
 from data_loader import load_dataset
 
-
-# ==========================================================
-# Configuration
-# ==========================================================
-
-INPUT_FILE = "data/raw/carbonomics_institutional_dataset.csv"
-
+INPUT_FILE = "data/synthetic/weekly_synthetic.csv"
 OUTPUT_DIRECTORY = "data/processed"
+OUTPUT_FILE = os.path.join(OUTPUT_DIRECTORY, "weekly_clean.csv")
 
-OUTPUT_FILE = os.path.join(
-    OUTPUT_DIRECTORY,
-    "cleaned_dataset.csv",
-)
-
-REQUIRED_COLUMNS = [
-    "electricity_kwh",
-    "diesel_litres",
-    "petrol_distance_km",
-    "diesel_distance_km",
-    "ev_electricity_kwh",
-    "college_bus_distance_km",
-    "public_bus_passenger_km",
-    "motorcycle_passenger_km",
-    "auto_passenger_km",
-    "bicycle_passenger_km",
-    "walking_passenger_km",
-    "waste_landfill_kg",
-    "compost_waste_kg",
-    "water_consumption_m3",
-    "methane_kg",
-    "nitrous_oxide_kg",
-]
+DATE_COLUMN = "week_start"
+ACTIVITY_COLUMNS = ["electricity_kwh", "diesel_litres"]
+REQUIRED_COLUMNS = [DATE_COLUMN] + ACTIVITY_COLUMNS
 
 
-# ==========================================================
-# Validation Functions
-# ==========================================================
-
-def validate_required_columns(
-    dataset: pd.DataFrame,
-    required_columns: List[str],
-) -> None:
-    """
-    Ensure all required columns exist.
-    """
-
-    missing_columns = [
-        column
-        for column in required_columns
-        if column not in dataset.columns
-    ]
-
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {missing_columns}"
-        )
+def validate_required_columns(dataset: pd.DataFrame, required_columns: List[str]) -> None:
+    missing = [c for c in required_columns if c not in dataset.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
 
 
-def validate_missing_values(
-    dataset: pd.DataFrame,
-) -> None:
-    """
-    Check for missing values.
-    """
-
-    missing = dataset.isnull().sum()
-
+def validate_missing_values(dataset: pd.DataFrame) -> None:
+    missing = dataset[REQUIRED_COLUMNS].isnull().sum()
     if missing.any():
-        raise ValueError(
-            f"Dataset contains missing values:\n{missing}"
-        )
+        raise ValueError(f"Dataset contains missing values:\n{missing}")
 
 
-def remove_duplicates(
-    dataset: pd.DataFrame,
-) -> pd.DataFrame:
-    """
-    Remove duplicate records.
-    """
+def validate_numeric_columns(dataset: pd.DataFrame) -> None:
+    non_numeric = [c for c in ACTIVITY_COLUMNS if not pd.api.types.is_numeric_dtype(dataset[c])]
+    if non_numeric:
+        raise TypeError(f"Required numeric columns found as non-numeric: {non_numeric}")
 
-    before = len(dataset)
 
-    dataset = dataset.drop_duplicates()
+def validate_negative_values(dataset: pd.DataFrame) -> None:
+    negative = [c for c in ACTIVITY_COLUMNS if (dataset[c] < 0).any()]
+    if negative:
+        raise ValueError(f"Negative values detected in: {negative}")
 
-    removed = before - len(dataset)
 
-    print(f"Duplicate Records Removed : {removed}")
-
+def validate_weekly_dates(dataset: pd.DataFrame) -> pd.DataFrame:
+    """Parse week_start and require strictly increasing 7-day steps."""
+    dataset = dataset.copy()
+    dataset[DATE_COLUMN] = pd.to_datetime(dataset[DATE_COLUMN])
+    steps = dataset[DATE_COLUMN].diff().dropna()
+    if not (steps == pd.Timedelta(days=7)).all():
+        raise ValueError("week_start must increase in exact 7-day steps with no gaps or repeats.")
     return dataset
 
 
-def validate_numeric_columns(
-    dataset: pd.DataFrame,
-) -> None:
-    """
-    Ensure all required columns are numeric.
-    """
-
-    non_numeric = []
-
-    for column in REQUIRED_COLUMNS:
-
-        if not pd.api.types.is_numeric_dtype(
-            dataset[column]
-        ):
-            non_numeric.append(column)
-
-    if non_numeric:
-        raise TypeError(
-            f"Required numeric columns found as non-numeric: {non_numeric}"
-        )
+def remove_duplicates(dataset: pd.DataFrame) -> pd.DataFrame:
+    before = len(dataset)
+    dataset = dataset.drop_duplicates()
+    print(f"Duplicate Records Removed : {before - len(dataset)}")
+    return dataset
 
 
-def validate_negative_values(
-    dataset: pd.DataFrame,
-) -> None:
-    """
-    Ensure required numeric columns do not
-    contain negative values.
-    """
-
-    negative_columns = []
-
-    for column in REQUIRED_COLUMNS:
-
-        if (dataset[column] < 0).any():
-            negative_columns.append(column)
-
-    if negative_columns:
-        raise ValueError(
-            f"Negative values detected in: {negative_columns}"
-        )
-
-# ==========================================================
-# Cleaning Pipeline
-# ==========================================================
-
-def clean_dataset() -> None:
-    """
-    Validate and prepare the institutional dataset.
-    """
-
+def clean_dataset(input_file: str = INPUT_FILE, output_file: str = OUTPUT_FILE) -> pd.DataFrame:
     print("=" * 70)
-    print("Carbonomics-AI")
-    print("Module 2 - Dataset Validation Pipeline")
+    print("Carbonomics-AI - Weekly Dataset Validation")
     print("=" * 70)
 
-    dataset = load_dataset(INPUT_FILE)
-
+    dataset = load_dataset(input_file)
     print(f"Rows Loaded      : {len(dataset)}")
     print(f"Columns Loaded   : {len(dataset.columns)}")
+    if "is_synthetic" in dataset.columns and dataset["is_synthetic"].all():
+        print("Data Label       : SYNTHETIC (calibrated to real monthly totals)")
 
-    validate_required_columns(
-        dataset,
-        REQUIRED_COLUMNS,
-    )
+    dataset.columns = dataset.columns.str.strip().str.lower()
+    validate_required_columns(dataset, REQUIRED_COLUMNS)
+    validate_missing_values(dataset)
+    validate_numeric_columns(dataset)
+    validate_negative_values(dataset)
+    dataset = remove_duplicates(dataset)
+    dataset = validate_weekly_dates(dataset)
 
-    validate_missing_values(
-        dataset,
-    )
-
-    validate_numeric_columns(
-        dataset,
-    )
-
-    validate_negative_values(
-        dataset,
-    )
-
-    dataset = remove_duplicates(
-        dataset,
-    )
-
-    # ==========================================================
-    # Standardize Column Names
-    # ==========================================================
-
-    dataset.columns = (
-        dataset.columns
-        .str.strip()
-        .str.lower()
-    )
-
-    # ==========================================================
-    # Export Clean Dataset
-    # ==========================================================
-
-    os.makedirs(
-        OUTPUT_DIRECTORY,
-        exist_ok=True,
-    )
-
-    dataset.to_csv(
-        OUTPUT_FILE,
-        index=False,
-    )
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    dataset.to_csv(output_file, index=False)
 
     print("-" * 70)
-    print("Validation Summary")
-    print("-" * 70)
-    print("[OK] Required Columns : PASS")
-    print("[OK] Missing Values   : PASS")
-    print("[OK] Numeric Data     : PASS")
-    print("[OK] Negative Values  : PASS")
-    print("[OK] Duplicates       : PASS")
-    print("-" * 70)
-
+    print("[OK] Required Columns / Missing / Numeric / Negative / Duplicates / Weekly dates : PASS")
     print(f"Rows Exported      : {len(dataset)}")
-    print(f"Output File        : {OUTPUT_FILE}")
-
+    print(f"Output File        : {output_file}")
     print("=" * 70)
-    print("Module 2 Validation Completed Successfully")
-    print("=" * 70)
-
-
-# ==========================================================
-# Main
-# ==========================================================
-
-def main() -> None:
-    """
-    Entry point.
-    """
-
-    clean_dataset()
+    return dataset
 
 
 if __name__ == "__main__":
-    main()
+    clean_dataset()

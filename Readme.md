@@ -130,11 +130,11 @@ Decision Support
 
 ### Phase 3 – Machine Learning
 
-- [x] Data Preprocessing
-- [x] Random Forest Model
-- [x] XGBoost Model
-- [x] Model Evaluation
-- [x] Emission Forecasting
+- [x] Weekly dataset validation (synthetic, calibrated to real monthly totals)
+- [x] Weekly activity forecast: Random Forest and XGBoost vs naive and mean baselines (time-based split)
+- [x] Model Evaluation (MAE, RMSE, R2)
+- [ ] Forecast on real weekly data (waiting for data)
+- [ ] Emission Forecasting for Scope 3 sources (no activity data yet)
 
 ### Phase 4 – Analytics
 
@@ -198,15 +198,31 @@ Carbonomics-AI is inspired by recent research in:
 
 ```
 Carbonomics-AI/
-│── data/
-│── notebooks/
-│── models/
-│── app/
+│── data/real/        real monthly 2025 electricity and generator diesel (Master Data)
+│── data/synthetic/   weekly SYNTHETIC dataset + metadata (assumptions, seed)
+│── data/processed/   validated weekly dataset
+│── src/              emission_factors, calculations, clean_data, process_dataset
+│── src/ml/           forecast_weekly (models + baselines), visualizer
+│── src/validation/   QA checks and report
+│── src/database/     PostgreSQL manager
+│── scripts/          run_pipeline.py (full flow), make_synthetic_weekly.py, verify_db.py
+│── database/         schema.sql, import.sql
+│── tests/            pytest
+│── outputs/          emissions, forecast metrics, plots, QA report
 │── docs/
-│── assets/
-│── README.md
 │── requirements.txt
 ```
+
+## Run
+
+```
+pip install -r requirements.txt
+python scripts/run_pipeline.py
+pytest tests
+```
+
+The weekly dataset is SYNTHETIC: only the monthly totals are real. See
+`docs/weekly_synthetic_forecast.md` for what is real, what is assumed and how to read the scores.
 
 ---
 

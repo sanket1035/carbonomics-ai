@@ -19,8 +19,7 @@ monthly total (asserted in the script and in `tests/`).
 
 ## Run
 ```
-python scripts/make_synthetic_weekly.py
-python scripts/run_weekly_forecast.py
+python scripts/run_pipeline.py   # full flow
 pytest tests
 ```
 
@@ -39,8 +38,8 @@ tree models do not reliably beat the naive baseline; that is reported as is.
 Replace `data/synthetic/weekly_synthetic.csv` with real weekly data when it
 exists and rerun.
 
-## Not touched in this change
-`src/ml/ml_pipeline.py` still predicts `Total_Emissions` from its own activity
-columns (target leakage) on the old `data/raw` dataset, whose scale does not
-match the real campus data. Committed files under `outputs/` (except
-`outputs/forecast/`) were produced by that old pipeline with the old factors.
+## Old dataset removed
+The earlier `data/raw` / `data/processed` 16-column dataset (about 3.7x the real electricity and
+7x the real generator diesel, no dates) and the pipeline built on it (`ml_pipeline.py`, which
+predicted `Total_Emissions` from its own activity columns) were removed. They remain in git history.
+Docs in `docs/*.docx` and `docs/*.xlsx` were written for that dataset and have not been updated.

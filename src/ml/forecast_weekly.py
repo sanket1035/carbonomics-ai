@@ -13,7 +13,7 @@ Rules followed:
   - features use only past information (lags and rolling means are shifted)
   - metrics MAE, RMSE, R2, always next to two baselines:
       naive_last_week (predict previous week) and train_mean
-  - input is the SYNTHETIC weekly file; scores demonstrate the pipeline, not
+  - input is the validated weekly file (currently SYNTHETIC); scores demonstrate the pipeline, not
     real forecasting accuracy (see scripts/make_synthetic_weekly.py)
 """
 
@@ -27,7 +27,7 @@ from xgboost import XGBRegressor
 
 from emission_factors import EMISSION_FACTORS
 
-INPUT_FILE = "data/synthetic/weekly_synthetic.csv"
+INPUT_FILE = "data/processed/weekly_clean.csv"
 OUTPUT_DIR = "outputs/forecast"
 TARGETS = {
     # target column -> emission factor key
@@ -102,7 +102,7 @@ def run_target(df: pd.DataFrame, target: str):
 def run_weekly_forecast(input_file: str = INPUT_FILE, output_dir: str = OUTPUT_DIR):
     if not os.path.exists(input_file):
         raise FileNotFoundError(
-            f"{input_file} not found. Run: python scripts/make_synthetic_weekly.py"
+            f"{input_file} not found. Run: python scripts/run_pipeline.py"
         )
     df = pd.read_csv(input_file, parse_dates=["week_start"])
     if "is_synthetic" in df.columns and df["is_synthetic"].all():

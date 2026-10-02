@@ -1,30 +1,18 @@
 -- ==========================================================
 -- Carbonomics-AI
--- Dataset Import Script
--- Module 2
+-- Manual import of the validated weekly dataset (pgAdmin / psql).
+-- scope*_kg and total_kg stay NULL here; scripts/run_pipeline.py fills them.
+-- Replace ABSOLUTE_PATH_TO_PROJECT first.
 -- ==========================================================
 
-COPY cleaned_dataset (
+COPY weekly_activity (
+    week_index,
+    week_start,
     electricity_kwh,
     diesel_litres,
-    petrol_distance_km,
-    diesel_distance_km,
-    ev_electricity_kwh,
-    college_bus_distance_km,
-    public_bus_passenger_km,
-    motorcycle_passenger_km,
-    auto_passenger_km,
-    bicycle_passenger_km,
-    walking_passenger_km,
-    waste_landfill_kg,
-    compost_waste_kg,
-    water_consumption_m3,
-    methane_kg,
-    nitrous_oxide_kg
+    is_synthetic
 )
-
-FROM 'ABSOLUTE_PATH_TO_PROJECT/data/processed/cleaned_dataset.csv'
-
+FROM 'ABSOLUTE_PATH_TO_PROJECT/data/processed/weekly_clean.csv'
 WITH (
     FORMAT CSV,
     HEADER TRUE,

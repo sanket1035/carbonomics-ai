@@ -1,140 +1,130 @@
 """
 db_manager.py
 
-Carbonomics-AI PostgreSQL Database Manager (Module 2 & Module 3 Integration)
+Carbonomics-AI PostgreSQL manager.
 
-This module manages connections and operations for PostgreSQL.
-If PostgreSQL credentials or dependencies (psycopg2/sqlalchemy) are not available,
-it logs a clear status message and skips database insertion gracefully without breaking the pipeline.
+Writes the weekly activity/emissions (weekly_activity) and the forecast test
+results (forecast_results). Inserts are upserts on the primary key, so running
+the pipeline again does not create duplicate rows. Tables are created from
+database/schema.sql if missing.
+
+If DB_PASSWORD is not set or psycopg2 is missing, the step is SKIPPED with a
+clear message and the pipeline continues.
+
+Environment variables: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
+(see .env.example).
 """
 
+import glob
 import os
+
 import pandas as pd
 
-def get_db_config():
-    """
-    Retrieve database configuration from environment variables.
-    """
-    host = os.environ.get("DB_HOST", "localhost")
-    port = os.environ.get("DB_PORT", "5432")
-    dbname = os.environ.get("DB_NAME", "carbonomics")
-    user = os.environ.get("DB_USER", "postgres")
-    password = os.environ.get("DB_PASSWORD", "")
-    
+SCHEMA_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "database", "schema.sql")
+
+
+def get_db_config() -> dict:
     return {
-        "host": host,
-        "port": port,
-        "dbname": dbname,
-        "user": user,
-        "password": password
+        "host": os.environ.get("DB_HOST", "localhost"),
+        "port": os.environ.get("DB_PORT", "5432"),
+        "dbname": os.environ.get("DB_NAME", "carbonomics_db"),
+        "user": os.environ.get("DB_USER", "postgres"),
+        "password": os.environ.get("DB_PASSWORD", ""),
     }
 
+
 def is_db_available():
-    """
-    Check if psycopg2 or sqlalchemy is installed and DB password/credentials are configured.
-    """
-    config = get_db_config()
-    if not config["password"]:
+    if not get_db_config()["password"]:
         return False, "DB_PASSWORD environment variable not set."
-    
     try:
-        import psycopg2
-        return True, "psycopg2 available"
+        import psycopg2  # noqa: F401
     except ImportError:
+        return False, "psycopg2 is not installed (pip install psycopg2-binary)."
+    return True, "psycopg2 available"
+
+
+def _connect():
+    import psycopg2
+
+    c = get_db_config()
+    conn = psycopg2.connect(host=c["host"], port=c["port"], dbname=c["dbname"],
+                            user=c["user"], password=c["password"])
+    with conn.cursor() as cur, open(SCHEMA_FILE, encoding="utf-8") as f:
+        cur.execute(f.read())
+    conn.commit()
+    return conn
+
+
+def _run(label: str, writer) -> dict:
+    available, msg = is_db_available()
+    if not available:
+        print(f"[PostgreSQL Status] SKIPPED - {msg}")
+        return {"status": "SKIPPED", "reason": msg, "inserted_rows": 0}
+    try:
+        conn = _connect()
         try:
-            import sqlalchemy
-            return True, "sqlalchemy available"
-        except ImportError:
-            return False, "Neither psycopg2 nor sqlalchemy module is installed."
-
-def insert_cleaned_dataset(dataset_path: str) -> dict:
-    """
-    Insert cleaned dataset CSV into PostgreSQL cleaned_dataset table.
-    """
-    available, msg = is_db_available()
-    if not available:
-        print(f"[PostgreSQL Status] SKIPPED - {msg}")
-        return {"status": "SKIPPED", "reason": msg, "inserted_rows": 0}
-    
-    config = get_db_config()
-    try:
-        import psycopg2
-        conn = psycopg2.connect(
-            host=config["host"],
-            port=config["port"],
-            dbname=config["dbname"],
-            user=config["user"],
-            password=config["password"]
-        )
-        cursor = conn.cursor()
-        df = pd.read_csv(dataset_path)
-        
-        insert_query = """
-        INSERT INTO cleaned_dataset (
-            electricity_kwh, diesel_litres, petrol_distance_km, diesel_distance_km,
-            ev_electricity_kwh, college_bus_distance_km, public_bus_passenger_km,
-            motorcycle_passenger_km, auto_passenger_km, bicycle_passenger_km,
-            walking_passenger_km, waste_landfill_kg, compost_waste_kg,
-            water_consumption_m3, methane_kg, nitrous_oxide_kg
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        
-        records = [tuple(x) for x in df.to_numpy()]
-        cursor.executemany(insert_query, records)
-        conn.commit()
-        inserted_count = len(records)
-        cursor.close()
-        conn.close()
-        
-        print(f"[PostgreSQL Status] SUCCESS - Inserted {inserted_count} records into 'cleaned_dataset'.")
-        return {"status": "SUCCESS", "reason": None, "inserted_rows": inserted_count}
-    except Exception as e:
-        print(f"[PostgreSQL Status] FAILED - {str(e)}")
+            count = writer(conn)
+            conn.commit()
+        finally:
+            conn.close()
+        print(f"[PostgreSQL Status] SUCCESS - Upserted {count} rows into '{label}'.")
+        return {"status": "SUCCESS", "reason": None, "inserted_rows": count}
+    except Exception as e:  # noqa: BLE001
+        print(f"[PostgreSQL Status] FAILED - {e}")
         return {"status": "FAILED", "reason": str(e), "inserted_rows": 0}
 
-def insert_prediction_results(prediction_df: pd.DataFrame) -> dict:
-    """
-    Insert ML prediction results into PostgreSQL prediction_results table.
-    """
-    available, msg = is_db_available()
-    if not available:
-        print(f"[PostgreSQL Status] SKIPPED - {msg}")
-        return {"status": "SKIPPED", "reason": msg, "inserted_rows": 0}
-    
-    config = get_db_config()
-    try:
-        import psycopg2
-        conn = psycopg2.connect(
-            host=config["host"],
-            port=config["port"],
-            dbname=config["dbname"],
-            user=config["user"],
-            password=config["password"]
-        )
-        cursor = conn.cursor()
-        
-        insert_query = """
-        INSERT INTO prediction_results (
-            actual_emission, predicted_emission, model_name, prediction_error
-        ) VALUES (%s, %s, %s, %s)
+
+def upsert_weekly_activity(emissions_path: str = "outputs/weekly_emissions.csv") -> dict:
+    def writer(conn):
+        df = pd.read_csv(emissions_path)
+        sql = """
+        INSERT INTO weekly_activity
+            (week_start, week_index, electricity_kwh, diesel_litres, is_synthetic,
+             scope1_kg, scope2_kg, total_kg)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (week_start) DO UPDATE SET
+            week_index = EXCLUDED.week_index,
+            electricity_kwh = EXCLUDED.electricity_kwh,
+            diesel_litres = EXCLUDED.diesel_litres,
+            is_synthetic = EXCLUDED.is_synthetic,
+            scope1_kg = EXCLUDED.scope1_kg,
+            scope2_kg = EXCLUDED.scope2_kg,
+            total_kg = EXCLUDED.total_kg
         """
-        
-        records = []
-        for _, row in prediction_df.iterrows():
-            actual = float(row.get("actual_Total_Emissions", 0.0))
-            predicted = float(row.get("predicted_Total_Emissions", 0.0))
-            model_name = str(row.get("model_used", "Unknown"))
-            error = float(row.get("prediction_error", 0.0))
-            records.append((actual, predicted, model_name, error))
-            
-        cursor.executemany(insert_query, records)
-        conn.commit()
-        inserted_count = len(records)
-        cursor.close()
-        conn.close()
-        
-        print(f"[PostgreSQL Status] SUCCESS - Inserted {inserted_count} predictions into 'prediction_results'.")
-        return {"status": "SUCCESS", "reason": None, "inserted_rows": inserted_count}
-    except Exception as e:
-        print(f"[PostgreSQL Status] FAILED - {str(e)}")
-        return {"status": "FAILED", "reason": str(e), "inserted_rows": 0}
+        rows = [
+            (r.week_start, int(r.week_index), float(r.electricity_kwh), float(r.diesel_litres),
+             bool(r.is_synthetic), float(r.scope1_kg), float(r.scope2_kg), float(r.total_kg))
+            for r in df.itertuples()
+        ]
+        with conn.cursor() as cur:
+            cur.executemany(sql, rows)
+        return len(rows)
+
+    return _run("weekly_activity", writer)
+
+
+def upsert_forecast_results(pred_dir: str = "outputs/forecast") -> dict:
+    def writer(conn):
+        sql = """
+        INSERT INTO forecast_results (week_start, target, model_name, actual, predicted, abs_error)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (week_start, target, model_name) DO UPDATE SET
+            actual = EXCLUDED.actual,
+            predicted = EXCLUDED.predicted,
+            abs_error = EXCLUDED.abs_error,
+            created_at = CURRENT_TIMESTAMP
+        """
+        rows = []
+        for path in glob.glob(os.path.join(pred_dir, "weekly_predictions_*.csv")):
+            df = pd.read_csv(path)
+            target = os.path.basename(path)[len("weekly_predictions_"):-len(".csv")]
+            for model_col in [c for c in df.columns if c.startswith("pred_")]:
+                model = model_col[len("pred_"):]
+                for _, r in df.iterrows():
+                    actual, pred = float(r[f"actual_{target}"]), float(r[model_col])
+                    rows.append((r["week_start"], target, model, actual, pred, abs(actual - pred)))
+        with conn.cursor() as cur:
+            cur.executemany(sql, rows)
+        return len(rows)
+
+    return _run("forecast_results", writer)
