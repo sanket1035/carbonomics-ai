@@ -38,3 +38,14 @@ def test_features_use_only_past():
 
 def test_target_is_activity_not_emission():
     assert set(fw.TARGETS) == {"electricity_kwh", "diesel_litres"}
+
+
+def test_emission_forecast_is_activity_times_factor():
+    df = syn.to_weekly(syn.build_daily(pd.read_csv(syn.REAL_FILE)))
+    df["week_start"] = pd.to_datetime(df["week_start"])
+    preds = {t: fw.run_target(df, t)[1] for t in fw.TARGETS}
+    table, metrics = fw.emission_forecast(preds)
+    e, d = preds["electricity_kwh"], preds["diesel_litres"]
+    expected = e["pred_random_forest"] * 0.71 + d["pred_random_forest"] * 2.89
+    assert (table["emission_pred_random_forest"] - expected).abs().max() < 1e-6
+    assert {"naive_last_week", "train_mean", "random_forest", "xgboost"} == set(metrics["model"])

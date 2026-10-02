@@ -67,3 +67,25 @@ def plot_metric_comparison(metrics_df: pd.DataFrame, save_dir: str = OUTPUT_PLOT
     plt.close(fig)
     print(f"[Visualization] Saved: {path}")
     return path
+
+
+def plot_emission_forecast(emission_table: pd.DataFrame, save_dir: str = OUTPUT_PLOT_DIR) -> str:
+    """Weekly total emission (Scope 1 + Scope 2): actual vs each model/baseline."""
+    _ensure_dir(save_dir)
+    path = os.path.join(save_dir, "forecast_emission_total.png")
+
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=200)
+    x = pd.to_datetime(emission_table["week_start"])
+    ax.plot(x, emission_table["actual_total_kg"], color="black", marker="o", linewidth=2, label="Actual (synthetic)")
+    for col in [c for c in emission_table.columns if c.startswith("emission_pred_")]:
+        ax.plot(x, emission_table[col], marker=".", linewidth=1.2, label=col.replace("emission_pred_", ""))
+    ax.set_title("Weekly emission (Scope 1 + Scope 2): actual vs predicted (test weeks)")
+    ax.set_xlabel("Week start")
+    ax.set_ylabel("kg CO2e per week")
+    ax.legend(frameon=False, fontsize=8)
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
+    print(f"[Visualization] Saved: {path}")
+    return path

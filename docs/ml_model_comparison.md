@@ -16,6 +16,12 @@ a good score only shows that the pipeline works. With 38 training weeks the tree
 models do not reliably beat the naive baseline; that is expected and is reported as is.
 Real weekly data is needed for any claim about real forecasting accuracy.
 
+Emission forecast: weekly Scope 1 (generator diesel) + Scope 2 (electricity) emission is
+predicted activity x factor, for every model and baseline, and scored with MAE, RMSE, R2
+(`outputs/forecast/weekly_emission_forecast.csv`, `weekly_emission_metrics.csv`,
+plot `outputs/plots/forecast_emission_total.png`). Trained models are written to
+`outputs/models/` (not committed).
+
 The earlier comparison (R2 0.9992 predicting `Total_Emissions` from its own activity
 columns on a random split) was removed: that target is an exact formula of the inputs
 (a plain linear regression reaches R2 = 1.0), so the score said nothing about forecasting.

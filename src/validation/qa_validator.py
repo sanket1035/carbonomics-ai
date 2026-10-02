@@ -132,12 +132,27 @@ def run_forecast_qa(metrics_path: str = METRICS_FILE, clean_path: str = CLEAN_FI
         naive = sub["naive_last_week"]
         beats[target] = {m: bool(sub[m] < naive) for m in sub.index if m not in ("naive_last_week", "train_mean")}
 
+    # Emission forecast must equal predicted activity x factor, and be non-negative.
+    emission_consistent = True
+    em_path = os.path.join(PRED_DIR, "weekly_emission_forecast.csv")
+    if os.path.exists(em_path):
+        em = pd.read_csv(em_path)
+        pe = pd.read_csv(os.path.join(PRED_DIR, "weekly_predictions_electricity_kwh.csv"))
+        pdz = pd.read_csv(os.path.join(PRED_DIR, "weekly_predictions_diesel_litres.csv"))
+        for col in [c for c in em.columns if c.startswith("emission_pred_")]:
+            m = col[len("emission_pred_"):]
+            expected = pe[f"pred_{m}"] * EMISSION_FACTORS["electricity"]["factor"] + pdz[f"pred_{m}"] * EMISSION_FACTORS["diesel"]["factor"]
+            emission_consistent &= bool((em[col] - expected).abs().max() < 0.011)
+    else:
+        emission_consistent = False
+
     return {
+        "emission_forecast_consistent": bool(emission_consistent),
         "baselines_present": bool(has_baselines),
         "chronological_split": bool(chronological),
         "non_negative_predictions": bool(non_negative),
         "beats_naive_info": beats,
-        "ok": bool(has_baselines and chronological and non_negative),
+        "ok": bool(has_baselines and chronological and non_negative and emission_consistent),
     }
 
 
@@ -180,6 +195,7 @@ def generate_qa_report() -> str:
         f"- Naive and mean baselines present: {fc.get('baselines_present')}",
         f"- Test weeks are chronologically after training weeks: {fc.get('chronological_split')}",
         f"- Non-negative predictions: {fc.get('non_negative_predictions')}",
+        f"- Emission forecast equals predicted activity x factor: {fc.get('emission_forecast_consistent')}",
         f"- Beats naive-last-week MAE (information only): {fc.get('beats_naive_info')}",
         "",
     ]

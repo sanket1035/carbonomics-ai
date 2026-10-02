@@ -28,4 +28,5 @@ All statuses below are computed from the pipeline outputs. Data is SYNTHETIC (ca
 - Naive and mean baselines present: True
 - Test weeks are chronologically after training weeks: True
 - Non-negative predictions: True
+- Emission forecast equals predicted activity x factor: True
 - Beats naive-last-week MAE (information only): {'electricity_kwh': {'random_forest': False, 'xgboost': False}, 'diesel_litres': {'random_forest': False, 'xgboost': True}}

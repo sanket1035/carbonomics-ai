@@ -18,6 +18,7 @@ Rules followed:
 """
 
 import os
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,7 @@ from emission_factors import EMISSION_FACTORS
 
 INPUT_FILE = "data/processed/weekly_clean.csv"
 OUTPUT_DIR = "outputs/forecast"
+MODEL_DIR = "outputs/models"
 TARGETS = {
     # target column -> emission factor key
     "electricity_kwh": "electricity",
@@ -65,7 +67,8 @@ def metrics(y_true, y_pred) -> dict:
     }
 
 
-def run_target(df: pd.DataFrame, target: str):
+def run_target(df: pd.DataFrame, target: str, models_out: dict = None):
+    """Fit and evaluate one target. Fitted models are stored in models_out if given."""
     feats = make_features(df, target)
     data = pd.concat([df[["week_start", target]], feats], axis=1).dropna().reset_index(drop=True)
     k = time_split(len(data))
@@ -86,6 +89,9 @@ def run_target(df: pd.DataFrame, target: str):
     xgb.fit(train[cols], train[target])
     preds["xgboost"] = xgb.predict(test[cols])
 
+    if models_out is not None:
+        models_out[target] = {"random_forest": rf, "xgboost": xgb}
+
     for name, p in preds.items():
         rows.append({"target": target, "model": name, "train_weeks": len(train),
                      "test_weeks": len(test), **metrics(test[target], p)})
@@ -99,6 +105,33 @@ def run_target(df: pd.DataFrame, target: str):
     return pd.DataFrame(rows), pred_df
 
 
+def emission_forecast(preds: dict) -> tuple:
+    """
+    Weekly emission forecast = predicted activity x emission factor, summed over the
+    two sources (diesel generator = Scope 1, electricity = Scope 2).
+    Returns (weekly table, metrics table). Baselines get the same treatment.
+    """
+    elec, dsl = preds["electricity_kwh"], preds["diesel_litres"]
+    f_e = EMISSION_FACTORS[TARGETS["electricity_kwh"]]["factor"]
+    f_d = EMISSION_FACTORS[TARGETS["diesel_litres"]]["factor"]
+    assert list(elec["week_start"]) == list(dsl["week_start"]), "test weeks differ between targets"
+
+    table = elec[["week_start"]].copy()
+    table["actual_scope2_kg"] = elec["actual_electricity_kwh"] * f_e
+    table["actual_scope1_kg"] = dsl["actual_diesel_litres"] * f_d
+    table["actual_total_kg"] = table["actual_scope1_kg"] + table["actual_scope2_kg"]
+
+    models = [c[len("pred_"):] for c in elec.columns if c.startswith("pred_")]
+    rows = []
+    for m in models:
+        table[f"emission_pred_{m}"] = elec[f"pred_{m}"] * f_e + dsl[f"pred_{m}"] * f_d
+        rows.append({"model": m, "test_weeks": len(table),
+                     **metrics(table["actual_total_kg"], table[f"emission_pred_{m}"]),
+                     "test_total_actual_kg": float(table["actual_total_kg"].sum()),
+                     "test_total_predicted_kg": float(table[f"emission_pred_{m}"].sum())})
+    return table, pd.DataFrame(rows)
+
+
 def run_weekly_forecast(input_file: str = INPUT_FILE, output_dir: str = OUTPUT_DIR):
     if not os.path.exists(input_file):
         raise FileNotFoundError(
@@ -109,15 +142,25 @@ def run_weekly_forecast(input_file: str = INPUT_FILE, output_dir: str = OUTPUT_D
         print("[Forecast] NOTE: input is SYNTHETIC weekly data; scores demonstrate the pipeline only.")
 
     os.makedirs(output_dir, exist_ok=True)
-    all_metrics, all_preds = [], {}
+    all_metrics, all_preds, fitted = [], {}, {}
     for target in TARGETS:
-        m, p = run_target(df, target)
+        m, p = run_target(df, target, models_out=fitted)
         all_metrics.append(m)
         all_preds[target] = p
         p.to_csv(os.path.join(output_dir, f"weekly_predictions_{target}.csv"), index=False)
 
     metrics_df = pd.concat(all_metrics, ignore_index=True)
     metrics_df.round(4).to_csv(os.path.join(output_dir, "weekly_metrics.csv"), index=False)
+
+    emission_table, emission_metrics = emission_forecast(all_preds)
+    emission_table.round(2).to_csv(os.path.join(output_dir, "weekly_emission_forecast.csv"), index=False)
+    emission_metrics.round(4).to_csv(os.path.join(output_dir, "weekly_emission_metrics.csv"), index=False)
+
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    for target, models in fitted.items():
+        for name, model in models.items():
+            with open(os.path.join(MODEL_DIR, f"{target}_{name}.pkl"), "wb") as f:
+                pickle.dump(model, f)
     return metrics_df, all_preds
 
 
