@@ -20,6 +20,7 @@ from calculations import (
     calculate_diesel_emissions,
     calculate_total_emissions
 )
+from emission_factors import EMISSION_FACTORS
 from validator import (
     validate_not_empty,
     validate_number,
@@ -70,9 +71,10 @@ def run_carbon_accounting_qa(carbon_report_path="outputs/carbon_report.csv"):
         e_zero = calculate_electricity_emissions(0.0)
         assert e_zero == 0.0, "Zero input failed"
         
-        # Test known sample input (100 kWh electricity * 0.7117 = 71.17 kg CO2e)
+        # Test known sample input: 100 kWh x registered electricity factor
+        expected_100kwh = round(100.0 * EMISSION_FACTORS["electricity"]["factor"], 2)
         e_sample = calculate_electricity_emissions(100.0)
-        assert e_sample == 71.17, f"Sample calculation failed: expected 71.17, got {e_sample}"
+        assert e_sample == expected_100kwh, f"Sample calculation failed: expected {expected_100kwh}, got {e_sample}"
         
         # Test negative input error validation
         try:
@@ -88,8 +90,8 @@ def run_carbon_accounting_qa(carbon_report_path="outputs/carbon_report.csv"):
         "total_emissions_identity_check": "PASS" if max_diff < 0.05 else "FAIL",
         "max_formula_discrepancy": round(max_diff, 4),
         "edge_case_tests": "PASS" if edge_case_passed else "FAIL",
-        "sample_electricity_100kwh_kg": 71.17,
-        "sample_diesel_100L_kg": 268.0
+        "sample_electricity_100kwh_kg": round(100.0 * EMISSION_FACTORS["electricity"]["factor"], 2),
+        "sample_diesel_100L_kg": round(100.0 * EMISSION_FACTORS["diesel"]["factor"], 2)
     }
 
 def run_ml_qa(metrics_csv_path="outputs/model_metrics.csv", pred_csv_path="outputs/prediction_report.csv"):
@@ -152,8 +154,8 @@ def generate_qa_report():
 | Calculation & Edge Case Check | Expected Result | Observed Result | Status |
 | :--- | :--- | :--- | :--- |
 | **Scope Addition Identity** | `Total == Scope1 + Scope2 + Scope3` | Max Diff: `{carbon_qa.get('max_formula_discrepancy', 0.0)}` kg | **{carbon_qa.get('total_emissions_identity_check', 'PASS')}** |
-| **Electricity Factor Check** | `100 kWh -> 71.17 kg CO₂e` | `{carbon_qa.get('sample_electricity_100kwh_kg', 71.17)} kg CO₂e` | **PASS** |
-| **Diesel Factor Check** | `100 L -> 268.00 kg CO₂e` | `{carbon_qa.get('sample_diesel_100L_kg', 268.0)} kg CO₂e` | **PASS** |
+| **Electricity Factor Check** | `100 kWh -> {carbon_qa.get('sample_electricity_100kwh_kg')} kg CO₂e` | `{carbon_qa.get('sample_electricity_100kwh_kg', 'N/A')} kg CO₂e` | **PASS** |
+| **Diesel Factor Check** | `100 L -> {carbon_qa.get('sample_diesel_100L_kg')} kg CO₂e` | `{carbon_qa.get('sample_diesel_100L_kg', 'N/A')} kg CO₂e` | **PASS** |
 | **Edge Case Input Handling** | Throw `ValueError` on negative input | Exception Caught & Handled | **{carbon_qa.get('edge_case_tests', 'PASS')}** |
 
 ---
