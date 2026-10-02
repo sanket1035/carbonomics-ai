@@ -225,7 +225,9 @@ Future versions of Carbonomics-AI will include:
 
 ## License
 
-This project is licensed under the MIT License.
+Copyright © 2026 Team Carbonomics. All rights reserved.
+This code is published for viewing and evaluation only. See LICENSE.
+For permission to use it, contact Carbonomics.app@gmail.com
 
 ---
 
