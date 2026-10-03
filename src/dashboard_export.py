@@ -57,7 +57,7 @@ _ILLUSTRATIVE_PRESETS = [
     {
         "id": "solar_100kwp",
         "label": "100 kWp rooftop solar",
-        "description": "100 kWp @ 4.5 peak-sun-hours/day × 30 days ≈ 13 500 kWh/month offset — ILLUSTRATIVE ASSUMPTION, not measured.",
+        "description": "100 kWp @ 4.5 peak-sun-hours/day × 30 days ≈ 13 500 kWh/month offset, on top of the existing rooftop solar (~1,810 kWh/month real) — ILLUSTRATIVE ASSUMPTION, not measured.",
         "electricity_change_pct": 0.0,
         "diesel_change_pct": 0.0,
         "solar_offset_kwh_per_month": 13_500.0,
@@ -103,9 +103,37 @@ def _build_simulation_payload(real_df: pd.DataFrame) -> dict:
     }
 
 
+SOLAR_NOTE = (
+    "Rooftop solar is self-consumed on campus and reported separately, NOT netted: "
+    "purchased grid electricity (Scope 2) stays as billed. Avoided emission = solar kWh x grid factor. "
+    "Solar period is Mar 2025 - Feb 2026; electricity and diesel are Jan - Dec 2025."
+)
+
+
+def build_solar_payload(solar: pd.DataFrame, electricity_kwh_total: float) -> dict:
+    """REAL monthly rooftop solar generation and avoided emission (not netted from Scope 2)."""
+    ef = EMISSION_FACTORS["electricity"]
+    solar = solar[["month", "solar_kwh"]].copy()
+    solar["avoided_tco2e"] = solar["solar_kwh"] * ef["factor"] / 1000
+    total_kwh = int(solar["solar_kwh"].sum())
+    return {
+        "monthly": _round(solar, 3),
+        "annual_kwh": total_kwh,
+        "avg_kwh_per_month": round(total_kwh / len(solar), 1),
+        "annual_avoided_tco2e": round(float(solar["avoided_tco2e"].sum()), 2),
+        "share_of_purchased_electricity": round(total_kwh / electricity_kwh_total, 4),
+        "period": f"{solar['month'].iloc[0]} to {solar['month'].iloc[-1]}",
+        "factor": {"name": "electricity", "factor": ef["factor"], "output": ef["output"],
+                   "source": ef["source"], "version": ef["version"]},
+        "note": SOLAR_NOTE,
+        "basis": "REAL monthly generation (Master Data sheet 6_Solar_Monthly)",
+    }
+
+
 def build_payload(root: str = ".") -> dict:
     p = lambda *a: os.path.join(root, *a)  # noqa: E731
     real = _read(p("data", "real", "real_monthly_2025.csv"))
+    solar = _read(p("data", "real", "real_solar_monthly.csv"))
     weekly = _read(p("outputs", "weekly_emissions.csv"))
     ef = EMISSION_FACTORS
 
@@ -178,6 +206,7 @@ def build_payload(root: str = ".") -> dict:
             "Domestic wastewater (804.17 tCO2e) - population based estimate",
             "College bus fleet, solid waste, refrigerant - annual figures only",
         ],
+        "solar": build_solar_payload(solar, float(real["electricity_kwh"].sum())),
         "simulation": _build_simulation_payload(real),
     }
 

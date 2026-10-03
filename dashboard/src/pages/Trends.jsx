@@ -16,6 +16,7 @@ const Chart = ({ children, data, xKey = 'week_start', xFmt = shortDate, unit }) 
 
 export default function Trends({ data }) {
   const monthly = data.real_monthly.map((r) => ({ ...r, label: monthName(r.month) }))
+  const solar = (data.solar?.monthly ?? []).map((r) => ({ ...r, label: `${monthName(r.month)} ${r.month.slice(2, 4)}` }))
   const weekly = data.weekly.map((w) => ({ ...w, scope1_t: w.scope1_kg / 1000, scope2_t: w.scope2_kg / 1000 }))
   return (
     <div className="space-y-6">
@@ -43,6 +44,20 @@ export default function Trends({ data }) {
           </Chart>
         </Card>
       </div>
+
+      {data.solar && (
+        <Card title="Rooftop solar generation, monthly" subtitle={`kWh, ${data.solar.period}. Self-consumed, reported separately (not netted from grid electricity)`} badge={<Real />}>
+          <Chart data={solar} xKey="label" xFmt={(v) => v}>
+            {({ t, xAxis, yAxis, data: d }) => (
+              <BarChart data={d} margin={{ left: -10 }}>
+                <CartesianGrid stroke={t.grid} vertical={false} />{xAxis}{yAxis}
+                <Tooltip contentStyle={t.tip} formatter={(v, n, item) => [`${fmt(v)} kWh (avoids ${fmt(item.payload.avoided_tco2e, 2)} tCO₂e)`, 'Solar']} cursor={{ fill: 'rgba(148,163,184,0.12)' }} />
+                <Bar isAnimationActive={false} dataKey="solar_kwh" name="Solar" fill={COLORS.solar} radius={[6, 6, 0, 0]} />
+              </BarChart>
+            )}
+          </Chart>
+        </Card>
+      )}
 
       <Callout title="Weekly charts below are SYNTHETIC">
         Only the monthly totals are real. The weekly values spread each month over its days using assumed weekday and noise patterns, then sum to 52 full weeks from 1 Jan 2025 (31 Dec is left out).

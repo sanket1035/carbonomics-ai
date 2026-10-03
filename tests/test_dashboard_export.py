@@ -49,3 +49,16 @@ def test_payload_simulation_key():
         assert "ILLUSTRATIVE" in p["description"].upper()
         assert "saved_tco2e" in p["annual"]
     assert "ILLUSTRATIVE" in sim["presets_note"].upper()
+
+
+def test_payload_solar_is_real_and_not_netted():
+    payload = de.build_payload(".")
+    s = payload["solar"]
+    assert len(s["monthly"]) == 12
+    assert s["annual_kwh"] == 21720  # Master Data sheet 6_Solar_Monthly, ANNUAL TOTAL
+    assert s["annual_avoided_tco2e"] == round(21720 * 0.71 / 1000, 2)  # 15.42 in sheet 18_Scope_Summary
+    assert s["period"] == "2025-03 to 2026-02"
+    assert abs(s["share_of_purchased_electricity"] - 0.0205) < 0.001  # ~2.1 % per Master Data
+    assert "NOT netted" in s["note"]
+    # Scope 2 headline stays the purchased (billed) electricity
+    assert payload["kpis"]["electricity_kwh"] == 1059147
