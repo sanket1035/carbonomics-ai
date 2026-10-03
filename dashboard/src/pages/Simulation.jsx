@@ -233,6 +233,12 @@ export default function Simulation({ data }) {
                 onChange={setSolarKwh}
                 unit=" kWh/mo"
               />
+              {data.solar && (
+                <p className="muted -mt-3 text-xs leading-relaxed">
+                  Existing rooftop solar (REAL): ~{fmt(data.solar.avg_kwh_per_month)} kWh/month, already self-consumed and not in the grid
+                  figures above. This slider adds <em>new</em> solar on top.
+                </p>
+              )}
               <button
                 onClick={reset}
                 className="w-full rounded-xl border border-slate-200 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 transition"

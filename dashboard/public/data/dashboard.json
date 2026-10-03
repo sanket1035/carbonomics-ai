@@ -1165,6 +1165,84 @@
   "Domestic wastewater (804.17 tCO2e) - population based estimate",
   "College bus fleet, solid waste, refrigerant - annual figures only"
  ],
+ "solar": {
+  "monthly": [
+   {
+    "month": "2025-03",
+    "solar_kwh": 1740,
+    "avoided_tco2e": 1.235
+   },
+   {
+    "month": "2025-04",
+    "solar_kwh": 1736,
+    "avoided_tco2e": 1.233
+   },
+   {
+    "month": "2025-05",
+    "solar_kwh": 2201,
+    "avoided_tco2e": 1.563
+   },
+   {
+    "month": "2025-06",
+    "solar_kwh": 2232,
+    "avoided_tco2e": 1.585
+   },
+   {
+    "month": "2025-07",
+    "solar_kwh": 2139,
+    "avoided_tco2e": 1.519
+   },
+   {
+    "month": "2025-08",
+    "solar_kwh": 1770,
+    "avoided_tco2e": 1.257
+   },
+   {
+    "month": "2025-09",
+    "solar_kwh": 1612,
+    "avoided_tco2e": 1.145
+   },
+   {
+    "month": "2025-10",
+    "solar_kwh": 1579,
+    "avoided_tco2e": 1.121
+   },
+   {
+    "month": "2025-11",
+    "solar_kwh": 1680,
+    "avoided_tco2e": 1.193
+   },
+   {
+    "month": "2025-12",
+    "solar_kwh": 1705,
+    "avoided_tco2e": 1.211
+   },
+   {
+    "month": "2026-01",
+    "solar_kwh": 1590,
+    "avoided_tco2e": 1.129
+   },
+   {
+    "month": "2026-02",
+    "solar_kwh": 1736,
+    "avoided_tco2e": 1.233
+   }
+  ],
+  "annual_kwh": 21720,
+  "avg_kwh_per_month": 1810.0,
+  "annual_avoided_tco2e": 15.42,
+  "share_of_purchased_electricity": 0.0205,
+  "period": "2025-03 to 2026-02",
+  "factor": {
+   "name": "electricity",
+   "factor": 0.71,
+   "output": "kg CO2e/kWh",
+   "source": "CEA, CO2 Baseline Database for the Indian Power Sector, User Guide",
+   "version": "V21.0, Nov 2025"
+  },
+  "note": "Rooftop solar is self-consumed on campus and reported separately, NOT netted: purchased grid electricity (Scope 2) stays as billed. Avoided emission = solar kWh x grid factor. Solar period is Mar 2025 - Feb 2026; electricity and diesel are Jan - Dec 2025.",
+  "basis": "REAL monthly generation (Master Data sheet 6_Solar_Monthly)"
+ },
  "simulation": {
   "baseline_monthly": [
    {
@@ -1386,7 +1464,7 @@
    {
     "id": "solar_100kwp",
     "label": "100 kWp rooftop solar",
-    "description": "100 kWp @ 4.5 peak-sun-hours/day \u00d7 30 days \u2248 13 500 kWh/month offset \u2014 ILLUSTRATIVE ASSUMPTION, not measured.",
+    "description": "100 kWp @ 4.5 peak-sun-hours/day \u00d7 30 days \u2248 13 500 kWh/month offset, on top of the existing rooftop solar (~1,810 kWh/month real) \u2014 ILLUSTRATIVE ASSUMPTION, not measured.",
     "electricity_change_pct": 0.0,
     "diesel_change_pct": 0.0,
     "solar_offset_kwh_per_month": 13500.0,

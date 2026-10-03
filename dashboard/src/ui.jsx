@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react'
 export const COLORS = {
   electricity: '#0f766e',
   diesel: '#d97706',
+  solar: '#ca8a04',
   actual: '#0f172a',
   models: {
     naive_last_week: '#64748b',

@@ -1,5 +1,5 @@
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Droplet, Factory, Leaf, Zap } from 'lucide-react'
+import { Droplet, Factory, Leaf, Sun, Zap } from 'lucide-react'
 import { COLORS, Callout, Card, Kpi, Real, fmt, monthName, useChartTheme } from '../ui.jsx'
 
 export default function Overview({ data }) {
@@ -64,6 +64,14 @@ export default function Overview({ data }) {
           </ul>
         </Card>
       </div>
+
+      {data.solar && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Kpi label="Rooftop solar generated" value={fmt(data.solar.annual_kwh)} unit="kWh / yr" sub={`${data.solar.period}, self-consumed`} icon={Sun} badge={<Real />} />
+          <Kpi label="Solar avoided emissions" value={fmt(data.solar.annual_avoided_tco2e, 2)} unit="tCO₂e / yr" sub="Reported separately, not netted" icon={Sun} badge={<Real />} />
+          <Kpi label="Solar vs purchased electricity" value={fmt(data.solar.share_of_purchased_electricity * 100, 1)} unit="%" sub={`of ${fmt(k.electricity_kwh)} kWh from the grid`} icon={Zap} />
+        </div>
+      )}
 
       <Callout tone="blue" title="Not covered here (no time series available)">
         <ul className="list-disc space-y-0.5 pl-5">
