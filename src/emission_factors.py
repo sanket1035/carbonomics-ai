@@ -194,3 +194,10 @@ EMISSION_FACTORS = {
 def unverified_factors():
     """Names of factors whose source has not been confirmed against the Master Data."""
     return [name for name, spec in EMISSION_FACTORS.items() if not spec["verified"]]
+
+
+# ── Campus footprint reference ─────────────────────────────────────────────────
+# Full KKWIEER footprint for reference / coverage notes.
+# Source: KKWIEER Carbon Footprint and Sustainability Report FY2025-26 (revised), Table 1.
+REPORT_FOOTPRINT_TCO2E = 3719.74
+REPORT_SOURCE = "KKWIEER Carbon Footprint and Sustainability Report FY2025-26 (revised), Table 1"

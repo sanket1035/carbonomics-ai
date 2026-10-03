@@ -3,8 +3,11 @@
 Static React site (Vite, Tailwind, Recharts). It only reads `public/data/dashboard.json`, which the
 Python pipeline writes (`python scripts/run_pipeline.py`, step 7). No server or Python is needed to host it.
 
-Pages: Overview, Trends, Forecast, Emission factors, Data & QA. Figures from the Energy team's monthly
-log are labelled REAL DATA; weekly values are labelled SYNTHETIC.
+Pages: Overview, Trends, Forecast, **Simulation** (what-if accounting, no ML), Emission factors, Data & QA.
+Figures from the Energy team's monthly log are labelled REAL DATA; weekly values are labelled SYNTHETIC.
+The Simulation page runs the accounting formula (emission = activity × factor) in the browser — same as `src/simulation.py`.
+Run `node scripts/parity_check.js` (from repo root) to verify JS and Python results agree to 2 decimal places.
+
 
 ## Run locally
 ```

@@ -138,19 +138,19 @@ Decision Support
 - [ ] Forecast on real weekly data (waiting for data)
 - [ ] Scope 3 forecasting (no weekly activity data yet)
 
-### Phase 4 – Analytics
+### Phase 4 – Analytics & Dashboard
 
-- [ ] Feature Importance Analysis
-- [ ] Interactive Dashboard
-- [ ] Trend Analysis
-- [ ] KPI Monitoring
+- [x] Feature Importance Analysis (model comparison in Forecast page)
+- [x] React dashboard (Vite + Tailwind + Recharts, 6 pages, static site — see `dashboard/`)
+- [x] Trend Analysis (Trends page: real monthly + synthetic weekly)
+- [x] KPI Monitoring (Overview page: annual tCO₂e, scope share, coverage)
 
 ### Phase 5 – Scenario Simulation
 
-- [ ] What-if Analysis
-- [ ] Renewable Energy Simulation
-- [ ] Electric Vehicle Adoption
-- [ ] Energy Efficiency Simulation
+- [x] What-if simulation (electricity, generator diesel, solar offset — `src/simulation.py` + React Simulation page)
+- [x] Renewable Energy Simulation (solar offset slider, 100 kWp preset)
+- [ ] Electric Vehicle Adoption (no time series yet)
+- [x] Energy Efficiency Simulation (LED retrofit preset — illustrative assumption)
 
 ### Phase 6 – Optimization
 
@@ -161,9 +161,9 @@ Decision Support
 
 ### Phase 7 – Web Application
 
-- [ ] Streamlit Dashboard
+- [x] React dashboard (static site, replaces Streamlit plan — `dashboard/`, deploye on Vercel/Netlify)
 - [ ] CSV Upload
-- [ ] User Interaction
+- [ ] User Interaction (basic sliders on Simulation page)
 - [ ] Report Generation
 
 ### Phase 8 – Deployment

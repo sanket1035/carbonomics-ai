@@ -17,14 +17,10 @@ import os
 
 import pandas as pd
 
-from emission_factors import EMISSION_FACTORS
+from emission_factors import EMISSION_FACTORS, REPORT_FOOTPRINT_TCO2E, REPORT_SOURCE
+from simulation import baseline as sim_baseline, simulate
 
 OUT_FILE = "dashboard/public/data/dashboard.json"
-
-# Full KKWIEER footprint for reference. Source: KKWIEER Carbon Footprint and
-# Sustainability Report FY2025-26 (revised), Table 1.
-REPORT_FOOTPRINT_TCO2E = 3719.74
-REPORT_SOURCE = "KKWIEER Carbon Footprint and Sustainability Report FY2025-26 (revised), Table 1"
 
 
 def _read(path):
@@ -47,6 +43,64 @@ def parse_qa_report(text: str) -> dict:
             status = "PASS" if title.rstrip().endswith("PASS") else ("FAIL" if title.rstrip().endswith("FAIL") else "")
             sections.append({"title": title.rsplit(":", 1)[0].lstrip("0123456789. ").strip(), "status": status})
     return {"overall": overall, "sections": sections, "markdown": text}
+
+
+_ILLUSTRATIVE_PRESETS = [
+    {
+        "id": "led_retrofit",
+        "label": "LED retrofit −15 %",
+        "description": "Replace all fluorescent fittings with LED — ILLUSTRATIVE ASSUMPTION, not measured.",
+        "electricity_change_pct": -15.0,
+        "diesel_change_pct": 0.0,
+        "solar_offset_kwh_per_month": 0.0,
+    },
+    {
+        "id": "solar_100kwp",
+        "label": "100 kWp rooftop solar",
+        "description": "100 kWp @ 4.5 peak-sun-hours/day × 30 days ≈ 13 500 kWh/month offset — ILLUSTRATIVE ASSUMPTION, not measured.",
+        "electricity_change_pct": 0.0,
+        "diesel_change_pct": 0.0,
+        "solar_offset_kwh_per_month": 13_500.0,
+    },
+    {
+        "id": "dg_optimise",
+        "label": "DG optimisation −30 %",
+        "description": "Reduce generator run-time by scheduling around grid outages — ILLUSTRATIVE ASSUMPTION, not measured.",
+        "electricity_change_pct": 0.0,
+        "diesel_change_pct": -30.0,
+        "solar_offset_kwh_per_month": 0.0,
+    },
+]
+_PRESETS_NOTE = (
+    "Presets are ILLUSTRATIVE ASSUMPTIONS only — not measured results. "
+    "Actual savings depend on implementation details, equipment specifications, and site conditions."
+)
+
+
+def _build_simulation_payload(real_df: pd.DataFrame) -> dict:
+    """Return simulation baseline + factor metadata + illustrative presets for the dashboard JSON."""
+    # baseline (zero-change) result carries monthly data + coverage note + factors
+    zero = simulate(real_df)
+    presets = []
+    for p in _ILLUSTRATIVE_PRESETS:
+        result = simulate(
+            real_df,
+            electricity_change_pct=p["electricity_change_pct"],
+            diesel_change_pct=p["diesel_change_pct"],
+            solar_offset_kwh_per_month=p["solar_offset_kwh_per_month"],
+        )
+        presets.append({
+            **p,
+            "annual": result["annual"],
+        })
+    return {
+        "baseline_monthly": zero["monthly"],
+        "factors_used": zero["factors_used"],
+        "coverage_note": zero["coverage_note"],
+        "presets": presets,
+        "presets_note": _PRESETS_NOTE,
+        "basis": "REAL monthly activity × emission factor (GHG Protocol accounting, not ML)",
+    }
 
 
 def build_payload(root: str = ".") -> dict:
@@ -124,6 +178,7 @@ def build_payload(root: str = ".") -> dict:
             "Domestic wastewater (804.17 tCO2e) - population based estimate",
             "College bus fleet, solid waste, refrigerant - annual figures only",
         ],
+        "simulation": _build_simulation_payload(real),
     }
 
 
