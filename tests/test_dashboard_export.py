@@ -26,3 +26,26 @@ def test_payload_is_json_serialisable_and_lists_all_factors():
     json.dumps(payload)
     assert {f["name"] for f in payload["factors"]} >= {"electricity", "diesel", "diesel_mobile"}
     assert all(f["source"] and f["version"] and f["unit"] for f in payload["factors"])
+
+
+def test_payload_simulation_key():
+    payload = de.build_payload(".")
+    sim = payload["simulation"]
+    # monthly baseline rows
+    assert len(sim["baseline_monthly"]) == 12
+    row0 = sim["baseline_monthly"][0]
+    for col in ("month", "base_scope2_tco2e", "base_scope1_tco2e", "base_total_tco2e"):
+        assert col in row0, f"Missing column: {col}"
+    # factors cited
+    names = {f["name"] for f in sim["factors_used"]}
+    assert "electricity" in names and "diesel" in names
+    # coverage note
+    cn = sim["coverage_note"]
+    assert cn["full_footprint_tco2e"] == 3719.74
+    assert 19.0 < cn["covered_share_pct"] < 22.0
+    # illustrative presets
+    assert len(sim["presets"]) == 3
+    for p in sim["presets"]:
+        assert "ILLUSTRATIVE" in p["description"].upper()
+        assert "saved_tco2e" in p["annual"]
+    assert "ILLUSTRATIVE" in sim["presets_note"].upper()

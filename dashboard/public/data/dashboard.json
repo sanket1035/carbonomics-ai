@@ -1164,5 +1164,267 @@
   "Student commuting (1,896.90 tCO2e in the report) - survey based, no time series",
   "Domestic wastewater (804.17 tCO2e) - population based estimate",
   "College bus fleet, solid waste, refrigerant - annual figures only"
- ]
+ ],
+ "simulation": {
+  "baseline_monthly": [
+   {
+    "month": "2025-01",
+    "base_electricity_kwh": 85611,
+    "base_diesel_litres": 70,
+    "base_scope2_tco2e": 60.7838,
+    "base_scope1_tco2e": 0.2023,
+    "base_total_tco2e": 60.9861,
+    "scen_electricity_kwh": 85611.0,
+    "scen_diesel_litres": 70.0,
+    "scen_scope2_tco2e": 60.7838,
+    "scen_scope1_tco2e": 0.2023,
+    "scen_total_tco2e": 60.9861
+   },
+   {
+    "month": "2025-02",
+    "base_electricity_kwh": 82814,
+    "base_diesel_litres": 105,
+    "base_scope2_tco2e": 58.7979,
+    "base_scope1_tco2e": 0.3034,
+    "base_total_tco2e": 59.1014,
+    "scen_electricity_kwh": 82814.0,
+    "scen_diesel_litres": 105.0,
+    "scen_scope2_tco2e": 58.7979,
+    "scen_scope1_tco2e": 0.3034,
+    "scen_total_tco2e": 59.1014
+   },
+   {
+    "month": "2025-03",
+    "base_electricity_kwh": 102400,
+    "base_diesel_litres": 185,
+    "base_scope2_tco2e": 72.704,
+    "base_scope1_tco2e": 0.5346,
+    "base_total_tco2e": 73.2386,
+    "scen_electricity_kwh": 102400.0,
+    "scen_diesel_litres": 185.0,
+    "scen_scope2_tco2e": 72.704,
+    "scen_scope1_tco2e": 0.5346,
+    "scen_total_tco2e": 73.2386
+   },
+   {
+    "month": "2025-04",
+    "base_electricity_kwh": 104759,
+    "base_diesel_litres": 385,
+    "base_scope2_tco2e": 74.3789,
+    "base_scope1_tco2e": 1.1127,
+    "base_total_tco2e": 75.4915,
+    "scen_electricity_kwh": 104759.0,
+    "scen_diesel_litres": 385.0,
+    "scen_scope2_tco2e": 74.3789,
+    "scen_scope1_tco2e": 1.1127,
+    "scen_total_tco2e": 75.4915
+   },
+   {
+    "month": "2025-05",
+    "base_electricity_kwh": 94016,
+    "base_diesel_litres": 980,
+    "base_scope2_tco2e": 66.7514,
+    "base_scope1_tco2e": 2.8322,
+    "base_total_tco2e": 69.5836,
+    "scen_electricity_kwh": 94016.0,
+    "scen_diesel_litres": 980.0,
+    "scen_scope2_tco2e": 66.7514,
+    "scen_scope1_tco2e": 2.8322,
+    "scen_total_tco2e": 69.5836
+   },
+   {
+    "month": "2025-06",
+    "base_electricity_kwh": 74496,
+    "base_diesel_litres": 595,
+    "base_scope2_tco2e": 52.8922,
+    "base_scope1_tco2e": 1.7196,
+    "base_total_tco2e": 54.6117,
+    "scen_electricity_kwh": 74496.0,
+    "scen_diesel_litres": 595.0,
+    "scen_scope2_tco2e": 52.8922,
+    "scen_scope1_tco2e": 1.7196,
+    "scen_total_tco2e": 54.6117
+   },
+   {
+    "month": "2025-07",
+    "base_electricity_kwh": 87258,
+    "base_diesel_litres": 490,
+    "base_scope2_tco2e": 61.9532,
+    "base_scope1_tco2e": 1.4161,
+    "base_total_tco2e": 63.3693,
+    "scen_electricity_kwh": 87258.0,
+    "scen_diesel_litres": 490.0,
+    "scen_scope2_tco2e": 61.9532,
+    "scen_scope1_tco2e": 1.4161,
+    "scen_total_tco2e": 63.3693
+   },
+   {
+    "month": "2025-08",
+    "base_electricity_kwh": 89306,
+    "base_diesel_litres": 140,
+    "base_scope2_tco2e": 63.4073,
+    "base_scope1_tco2e": 0.4046,
+    "base_total_tco2e": 63.8119,
+    "scen_electricity_kwh": 89306.0,
+    "scen_diesel_litres": 140.0,
+    "scen_scope2_tco2e": 63.4073,
+    "scen_scope1_tco2e": 0.4046,
+    "scen_total_tco2e": 63.8119
+   },
+   {
+    "month": "2025-09",
+    "base_electricity_kwh": 95050,
+    "base_diesel_litres": 280,
+    "base_scope2_tco2e": 67.4855,
+    "base_scope1_tco2e": 0.8092,
+    "base_total_tco2e": 68.2947,
+    "scen_electricity_kwh": 95050.0,
+    "scen_diesel_litres": 280.0,
+    "scen_scope2_tco2e": 67.4855,
+    "scen_scope1_tco2e": 0.8092,
+    "scen_total_tco2e": 68.2947
+   },
+   {
+    "month": "2025-10",
+    "base_electricity_kwh": 87074,
+    "base_diesel_litres": 336,
+    "base_scope2_tco2e": 61.8225,
+    "base_scope1_tco2e": 0.971,
+    "base_total_tco2e": 62.7936,
+    "scen_electricity_kwh": 87074.0,
+    "scen_diesel_litres": 336.0,
+    "scen_scope2_tco2e": 61.8225,
+    "scen_scope1_tco2e": 0.971,
+    "scen_total_tco2e": 62.7936
+   },
+   {
+    "month": "2025-11",
+    "base_electricity_kwh": 80577,
+    "base_diesel_litres": 240,
+    "base_scope2_tco2e": 57.2097,
+    "base_scope1_tco2e": 0.6936,
+    "base_total_tco2e": 57.9033,
+    "scen_electricity_kwh": 80577.0,
+    "scen_diesel_litres": 240.0,
+    "scen_scope2_tco2e": 57.2097,
+    "scen_scope1_tco2e": 0.6936,
+    "scen_total_tco2e": 57.9033
+   },
+   {
+    "month": "2025-12",
+    "base_electricity_kwh": 75786,
+    "base_diesel_litres": 294,
+    "base_scope2_tco2e": 53.8081,
+    "base_scope1_tco2e": 0.8497,
+    "base_total_tco2e": 54.6577,
+    "scen_electricity_kwh": 75786.0,
+    "scen_diesel_litres": 294.0,
+    "scen_scope2_tco2e": 53.8081,
+    "scen_scope1_tco2e": 0.8497,
+    "scen_total_tco2e": 54.6577
+   }
+  ],
+  "factors_used": [
+   {
+    "name": "electricity",
+    "factor": 0.71,
+    "scope": "Scope 2",
+    "unit": "kWh",
+    "output": "kg CO2e/kWh",
+    "source": "CEA, CO2 Baseline Database for the Indian Power Sector, User Guide",
+    "version": "V21.0, Nov 2025",
+    "verified": true
+   },
+   {
+    "name": "diesel",
+    "factor": 2.89,
+    "scope": "Scope 1",
+    "unit": "Litre",
+    "output": "kg CO2/L",
+    "source": "CEA, CO2 Baseline Database, Appendix B (liquid fuel oil)",
+    "version": "V20.0, Dec 2024",
+    "verified": true
+   }
+  ],
+  "coverage_note": {
+   "covered_tco2e": 763.84,
+   "full_footprint_tco2e": 3719.74,
+   "full_footprint_source": "KKWIEER Carbon Footprint and Sustainability Report FY2025-26 (revised), Table 1",
+   "covered_share_pct": 20.5,
+   "covered_sources": [
+    "electricity_kwh   \u00d7 electricity emission factor \u2192 Scope 2",
+    "dg_diesel_litres  \u00d7 diesel emission factor       \u2192 Scope 1"
+   ],
+   "not_covered": [
+    "Student commuting (\u22481 896.90 tCO\u2082e in the report) \u2014 survey-based, no time series",
+    "Domestic wastewater (\u2248804.17 tCO\u2082e) \u2014 population-based estimate",
+    "College bus fleet, solid waste, refrigerant \u2014 annual figures only"
+   ],
+   "note": "This simulation covers ~20.5 % of the full 3719.74 tCO\u2082e campus footprint. Commuting and wastewater are not simulated (no time series)."
+  },
+  "presets": [
+   {
+    "id": "led_retrofit",
+    "label": "LED retrofit \u221215 %",
+    "description": "Replace all fluorescent fittings with LED \u2014 ILLUSTRATIVE ASSUMPTION, not measured.",
+    "electricity_change_pct": -15.0,
+    "diesel_change_pct": 0.0,
+    "solar_offset_kwh_per_month": 0.0,
+    "annual": {
+     "baseline_scope2_tco2e": 751.9944,
+     "baseline_scope1_tco2e": 11.849,
+     "baseline_total_tco2e": 763.8434,
+     "scenario_scope2_tco2e": 639.1952,
+     "scenario_scope1_tco2e": 11.849,
+     "scenario_total_tco2e": 651.0442,
+     "saved_tco2e": 112.7992,
+     "saved_pct": 14.77,
+     "saved_scope2_tco2e": 112.7992,
+     "saved_scope1_tco2e": 0.0
+    }
+   },
+   {
+    "id": "solar_100kwp",
+    "label": "100 kWp rooftop solar",
+    "description": "100 kWp @ 4.5 peak-sun-hours/day \u00d7 30 days \u2248 13 500 kWh/month offset \u2014 ILLUSTRATIVE ASSUMPTION, not measured.",
+    "electricity_change_pct": 0.0,
+    "diesel_change_pct": 0.0,
+    "solar_offset_kwh_per_month": 13500.0,
+    "annual": {
+     "baseline_scope2_tco2e": 751.9944,
+     "baseline_scope1_tco2e": 11.849,
+     "baseline_total_tco2e": 763.8434,
+     "scenario_scope2_tco2e": 636.9744,
+     "scenario_scope1_tco2e": 11.849,
+     "scenario_total_tco2e": 648.8234,
+     "saved_tco2e": 115.02,
+     "saved_pct": 15.06,
+     "saved_scope2_tco2e": 115.02,
+     "saved_scope1_tco2e": 0.0
+    }
+   },
+   {
+    "id": "dg_optimise",
+    "label": "DG optimisation \u221230 %",
+    "description": "Reduce generator run-time by scheduling around grid outages \u2014 ILLUSTRATIVE ASSUMPTION, not measured.",
+    "electricity_change_pct": 0.0,
+    "diesel_change_pct": -30.0,
+    "solar_offset_kwh_per_month": 0.0,
+    "annual": {
+     "baseline_scope2_tco2e": 751.9944,
+     "baseline_scope1_tco2e": 11.849,
+     "baseline_total_tco2e": 763.8434,
+     "scenario_scope2_tco2e": 751.9944,
+     "scenario_scope1_tco2e": 8.2943,
+     "scenario_total_tco2e": 760.2887,
+     "saved_tco2e": 3.5547,
+     "saved_pct": 0.47,
+     "saved_scope2_tco2e": 0.0,
+     "saved_scope1_tco2e": 3.5547
+    }
+   }
+  ],
+  "presets_note": "Presets are ILLUSTRATIVE ASSUMPTIONS only \u2014 not measured results. Actual savings depend on implementation details, equipment specifications, and site conditions.",
+  "basis": "REAL monthly activity \u00d7 emission factor (GHG Protocol accounting, not ML)"
+ }
 }
