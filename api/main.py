@@ -196,6 +196,35 @@ def optimize(req: OptimizeRequest, user: User = Depends(current_user)) -> dict:
     return result
 
 
+def _report_forecast(df, sources, granularity) -> dict:
+    """The forecast is recomputed here from the periods (training takes a few seconds), never trusted from the browser."""
+    if granularity != "weekly":
+        return {"status": "skipped", "reason": "Monthly data has too few points for an ML forecast."}
+    if len(df) < upload_analysis.MIN_WEEKS_FOR_ML:
+        return {"status": "skipped", "reason": f"Only {len(df)} weeks of data; at least {upload_analysis.MIN_WEEKS_FOR_ML} are needed."}
+    try:
+        return upload_analysis.forecast(df.rename(columns={"period_start": "week_start"}), sources, upload_analysis.DEFAULT_FUTURE_WEEKS)
+    except Exception as exc:  # a failed forecast must not block the rest of the report
+        return {"status": "skipped", "reason": f"The forecast could not be computed ({type(exc).__name__})."}
+
+
+def _report_factor_change(periods: list) -> Optional[dict]:
+    """Default comparison for the report: the last two complete years, each with the grid factor of the fiscal year that ends in it."""
+    try:
+        years = factor_change.years_available(periods)
+        if len(years) < 2:
+            return None
+        fys = sorted(emission_factors.GRID_FACTOR_BY_FY)
+
+        def fy_for(year):
+            ending = [f for f in fys if int(f[:4]) + 1 == year]
+            return ending[0] if ending else min(fys, key=lambda f: abs(int(f[:4]) + 1 - year))
+        ya, yb = years[-2:]
+        return factor_change.compare(periods, ya, yb, fy_for(ya), fy_for(yb))
+    except factor_change.FactorChangeError:
+        return None
+
+
 class ReportRequest(BaseModel):
     periods: List[Period] = Field(min_length=1, max_length=upload_analysis.MAX_SIM_PERIODS)
     granularity: str = Field(max_length=10)
@@ -229,6 +258,8 @@ def report(req: ReportRequest, user: User = Depends(current_user)) -> Response:
         "factors_used": upload_analysis.factors_used(sources),
         "accounting": upload_analysis.account(df, "period_start", sources),
     }
+    analysis["forecast"] = _report_forecast(df, sources, req.granularity)
+    analysis["factor_change"] = _report_factor_change(periods)
     plan = None
     if req.budget_inr is not None and req.measures:
         try:

@@ -546,7 +546,8 @@ def _factor_text(analysis: dict) -> str:
 
 def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = None, scope3: Optional[dict] = None,
                       prepared_for: str = "", data_source: str = "", generated_on: str = "") -> str:
-    """Cover, About, At a glance, Method, Results, plus Optimization and Recommended steps when a plan is given."""
+    """Cover, About, At a glance, Method, Results, Trend, Sources, Forecast and Training (when forecast ran), What-if,
+    Grid factor, plus Optimization and Recommended steps when a plan is given, then Data and limits."""
     from report_cover import CoverInfo, ReportDetails, draw_cover, draw_details_page
     inp = analysis["input"]
     sources = [k for k in ("electricity_kwh", "diesel_litres") if k in inp["columns_used"]]
@@ -562,15 +563,42 @@ def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = 
     c.showPage()
     draw_details_page(c, info, details)
     c.showPage()
+    import report_extra as rx
     n = 3
     for draw in (draw_glance_page, draw_method_page, draw_results_page):
         draw(c, analysis, scope3, n)
         c.showPage()
         n += 1
+    rx.draw_trend_page(c, analysis, n)
+    c.showPage()
+    rx.draw_sources_page(c, analysis, n + 1)
+    c.showPage()
+    n += 2
+    fc = analysis.get("forecast")
+    if fc and fc.get("status") == "ok":
+        for target in fc["targets"]:
+            rx.draw_forecast_page(c, analysis, target, n)
+            c.showPage()
+            n += 1
+        rx.draw_training_page(c, analysis, n)
+        c.showPage()
+        n += 1
+    else:
+        rx._skipped_page(c, n, (fc or {}).get("reason", "The data was too short for a forecast."))
+        c.showPage()
+        n += 1
+    rx.draw_sensitivity_page(c, analysis, n)
+    c.showPage()
+    rx.draw_factor_page(c, analysis, n + 1, analysis.get("factor_change"))
+    c.showPage()
+    n += 2
     if optimization:
         draw_optimization_page(c, optimization, n)
         c.showPage()
         draw_steps_page(c, optimization, n + 1)
         c.showPage()
+        n += 2
+    rx.draw_notes_page(c, analysis, n, scope3)
+    c.showPage()
     c.save()
     return path
