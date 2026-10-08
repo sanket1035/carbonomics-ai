@@ -64,3 +64,10 @@ def test_every_page_after_the_cover_has_the_frame(tmp_path, audit):
     assert marker not in pages[0].get_contents().get_data().decode("latin-1")
     for p in pages[1:]:
         assert marker in p.get_contents().get_data().decode("latin-1")
+
+
+def test_notes_page_lists_the_benchmark_sources_only_with_the_audit(tmp_path, audit):
+    with_audit = _text(build_full_report(str(tmp_path / "e.pdf"), _analysis(), energy_audit=audit)).replace("\n", " ")
+    without = _text(build_full_report(str(tmp_path / "f.pdf"), _analysis())).replace("\n", " ")
+    assert "Scheme for BEE Star Rating for Office Buildings" in with_audit
+    assert "Scheme for BEE Star Rating for Office Buildings" not in without
