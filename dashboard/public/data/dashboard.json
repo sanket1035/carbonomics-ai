@@ -1736,5 +1736,165 @@
   "default_budget_inr": 500000,
   "basis": "FAKE monthly baseline \u00d7 emission factor; MILP (scipy.optimize.milp); not ML",
   "status_message": null
+ },
+ "energy_audit": {
+  "period": "Demo year (fake)",
+  "basis": "FAKE monthly electricity / FAKE built-up area; formula only, no ML",
+  "zone": "composite",
+  "zone_note": "The climate zone of a real site matters: the 5-star cut-off is 40 (Composite) or 45 (Warm and Humid) kWh/m2/year. The demo uses Composite.",
+  "actual": {
+   "electricity_kwh": 500840.0,
+   "electricity_tco2e": 355.6,
+   "grid_factor": 0.71,
+   "grid_factor_unit": "kg CO2e/kWh",
+   "grid_factor_source": "CEA, CO2 Baseline Database for the Indian Power Sector, User Guide, V21.0, Nov 2025",
+   "built_up_area_m2": 20000.0,
+   "area_source": "FAKE demo figure",
+   "epi": 25.04,
+   "epi_unit": "kWh/m2/year",
+   "persons": 4500,
+   "kwh_per_person": 111.3,
+   "proxy_star_rating": 5
+  },
+  "references": [
+   {
+    "key": "bee_office_lt50ac_5star",
+    "label": "BEE 5-star cut-off, office scheme, <50% air-conditioned",
+    "role": "reference",
+    "benchmark_epi": 40.0,
+    "unit": "kWh/m2/year",
+    "source": "BEE, Scheme for BEE Star Rating for Office Buildings (Annexure 3/4, EPI bands)",
+    "version": "February 2009",
+    "basis": "Proxy: office scheme applied to an educational campus; the cut-off depends on the climate zone",
+    "verified": false,
+    "target_kwh": 800000.0,
+    "target_tco2e": 568.0,
+    "gap_kwh": -299160.0,
+    "gap_tco2e": -212.4,
+    "position": "below_target"
+   },
+   {
+    "key": "shunya_net_zero",
+    "label": "BEE Shunya net-zero label (EPI 10 to 0)",
+    "role": "aspirational",
+    "benchmark_epi": 10.0,
+    "unit": "kWh/m2/year",
+    "source": "Net-Zero Energy Campuses in India, Sustainability 2024, 16(1), 87 (secondary source quoting the BEE Shunya label)",
+    "version": "2024",
+    "basis": "Aspirational only: how far the campus is from net-zero. Upper bound of the 10 to 0 range",
+    "verified": false,
+    "target_kwh": 200000.0,
+    "target_tco2e": 142.0,
+    "gap_kwh": 300840.0,
+    "gap_tco2e": 213.6,
+    "position": "above_target"
+   }
+  ],
+  "ac": {
+   "basis": "FAKE demo inventory, not metered",
+   "units_total": 34,
+   "sites": [
+    {
+     "location": "Demo block A",
+     "units": 8,
+     "capacity_ton": 1.5,
+     "listed_power_per_unit_kw": 5.28,
+     "cooling_capacity_per_unit_kw": 5.276,
+     "listed_equals_cooling_capacity": true,
+     "modelled_kwh": 110246.4,
+     "corrected_kwh": {
+      "low": 44061.0,
+      "central": 36717.5,
+      "high": 27538.1
+     }
+    },
+    {
+     "location": "Demo block B",
+     "units": 10,
+     "capacity_ton": 1.5,
+     "listed_power_per_unit_kw": 5.28,
+     "cooling_capacity_per_unit_kw": 5.276,
+     "listed_equals_cooling_capacity": true,
+     "modelled_kwh": 137808.0,
+     "corrected_kwh": {
+      "low": 55076.2,
+      "central": 45896.8,
+      "high": 34422.6
+     }
+    },
+    {
+     "location": "Demo guest house",
+     "units": 12,
+     "capacity_ton": 1.0,
+     "listed_power_per_unit_kw": 3.52,
+     "cooling_capacity_per_unit_kw": 3.517,
+     "listed_equals_cooling_capacity": true,
+     "modelled_kwh": 146995.2,
+     "corrected_kwh": {
+      "low": 58748.0,
+      "central": 48956.6,
+      "high": 36717.5
+     }
+    },
+    {
+     "location": "Demo office",
+     "units": 4,
+     "capacity_ton": 1.0,
+     "listed_power_per_unit_kw": 3.52,
+     "cooling_capacity_per_unit_kw": 3.517,
+     "listed_equals_cooling_capacity": true,
+     "modelled_kwh": 36748.8,
+     "corrected_kwh": {
+      "low": 14687.0,
+      "central": 12239.2,
+      "high": 9179.4
+     }
+    }
+   ],
+   "modelled_kwh": 431798.4,
+   "modelled_share_of_purchased": 0.8621,
+   "listed_kw_is_cooling_capacity": true,
+   "ton_of_refrigeration_kw_thermal": 3.517,
+   "assumed_cop": {
+    "low": 2.5,
+    "central": 3.0,
+    "high": 4.0
+   },
+   "cop_label": "ASSUMED coefficient of performance (cooling kW per electrical kW). Not from a source; replace with nameplate rated input power or ISEER once collected.",
+   "corrected_kwh": {
+    "low": 172572.2,
+    "central": 143810.1,
+    "high": 107857.6
+   },
+   "corrected_tco2e": {
+    "low": 122.53,
+    "central": 102.11,
+    "high": 76.58
+   },
+   "corrected_share_of_purchased": {
+    "low": 0.3446,
+    "central": 0.2871,
+    "high": 0.2154
+   },
+   "sanity_guest_house": {
+    "location": "Demo guest house",
+    "area_m2": 600.0,
+    "modelled_ac_kwh_per_m2": 245.0,
+    "corrected_ac_kwh_per_m2": {
+     "low": 97.9,
+     "central": 81.6,
+     "high": 61.2
+    },
+    "note": "AC electricity only, so the guest house total EPI is higher than these figures."
+   },
+   "note": "Fake inventory. The corrected figures depend on the ASSUMED COP and on fake operating days and hours."
+  },
+  "caveats": [
+   "No official BEE/ECBC EPI exists for educational buildings: every benchmark here is a proxy.",
+   "The climate-zone mapping of the BEE bands is inferred from extracted PDF text, not checked against the original.",
+   "Built-up area is the brochure figure; a larger real area would lower the EPI further.",
+   "No end-use metering exists (AC, lights, fans, pumps), so no waste is claimed from this calculation.",
+   "A negative gap means the campus is already below the reference, not that no saving is possible."
+  ]
  }
 }

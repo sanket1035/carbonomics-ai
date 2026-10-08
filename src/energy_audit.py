@@ -72,7 +72,7 @@ def _ac_block(ac: pd.DataFrame, total_kwh: float, guest_house_area_m2: float) ->
         sites.append(site)
     modelled = sum(s["modelled_kwh"] for s in sites)
     corrected = {k: round(sum(s["corrected_kwh"][k] for s in sites), 1) for k in ASSUMED_COP}
-    gh = next(s for s in sites if s["location"] == "Guest House")
+    gh = next((s for s in sites if "guest house" in s["location"].lower()), None)
     return {
         "basis": "MODELLED (Master Data sheet 4_AC_Inventory), not metered",
         "units_total": sum(s["units"] for s in sites),
@@ -86,12 +86,13 @@ def _ac_block(ac: pd.DataFrame, total_kwh: float, guest_house_area_m2: float) ->
         "corrected_kwh": corrected,
         "corrected_tco2e": {k: round(v * ef / 1000, 2) for k, v in corrected.items()},
         "corrected_share_of_purchased": {k: round(v / total_kwh, 4) for k, v in corrected.items()},
-        "sanity_guest_house": {
+        "sanity_guest_house": None if gh is None else {
+            "location": gh["location"],
             "area_m2": guest_house_area_m2,
             "modelled_ac_kwh_per_m2": round(gh["modelled_kwh"] / guest_house_area_m2, 1),
             "corrected_ac_kwh_per_m2": {k: round(v / guest_house_area_m2, 1)
                                         for k, v in gh["corrected_kwh"].items()},
-            "note": "AC electricity only, so the Guest House total EPI is higher than these figures.",
+            "note": "AC electricity only, so the guest house total EPI is higher than these figures.",
         },
         "note": ("The original sheet is left unchanged. The corrected figures depend on the ASSUMED COP "
                  "and on the same operating days and hours as the sheet, which are also unverified."),
