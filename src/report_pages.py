@@ -625,7 +625,7 @@ def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = 
         draw_steps_page(c, optimization, n + 1)
         c.showPage()
         n += 2
-    rx.draw_notes_page(c, analysis, n, scope3, inventory)
+    rx.draw_notes_page(c, analysis, n, scope3, inventory, energy_audit)
     c.showPage()
     c.save()
     return path
