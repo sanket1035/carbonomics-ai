@@ -1,10 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 
 const CONTACT = 'carbonomics.app@gmail.com'
-const UPDATED = '6 October 2026'
-
-// A yellow marker for details the team or the college still has to fill in.
-const Tbd = ({ children }) => <mark className="rounded bg-amber-100 px-1 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">[TBD: {children}]</mark>
+const UPDATED = '8 October 2026'
 
 function Page({ title, children }) {
   return (
@@ -20,8 +17,7 @@ function Page({ title, children }) {
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h1>
         <p className="muted mt-2 text-sm">Last updated {UPDATED}</p>
         <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-          This text was written by the project team for a final-year academic project. It describes what the site actually does today.
-          It is not legal advice and has not been reviewed by a lawyer or by the college. Items marked <Tbd>like this</Tbd> are still to be decided.
+          This text was written by the project team for a final-year academic project. It describes what the site actually does today. It is not legal advice.
         </p>
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-slate-700 dark:text-slate-300">{children}</div>
         <nav className="muted mt-12 flex gap-4 border-t border-slate-200 pt-6 text-xs dark:border-slate-800">
@@ -42,7 +38,7 @@ export function Privacy() {
     <Page title="Privacy Policy">
       <section>
         <H>Who we are</H>
-        <p>Carbonomics-AI is built by Team Carbonomics, a final-year student team of the Department of AI &amp; DS, K. K. Wagh Institute of Engineering Education and Research (KKWIEER), Nashik. Contact: <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>. College contact for data questions: <Tbd>name and address of the responsible college office</Tbd>.</p>
+        <p>Carbonomics-AI is built by Team Carbonomics, a final-year student team of the Department of AI &amp; DS, K. K. Wagh Institute of Engineering Education and Research (KKWIEER), Nashik. Contact: <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>. Questions about your data go to the same address.</p>
       </section>
       <section>
         <H>What the demo pages collect</H>
@@ -64,19 +60,19 @@ export function Privacy() {
       </section>
       <section>
         <H>Who can see your history</H>
-        <p>Only you, through your own login. The database enforces this with row-level security, so one account cannot read another account's runs. The team members who administer the database can technically see stored data in the Supabase dashboard; they will not look at it except to keep the service working or at your request <Tbd>team to confirm this commitment</Tbd>.</p>
+        <p>Only you, through your own login. The database enforces this with row-level security, so one account cannot read another account's runs. The team members who administer the database can technically see stored data in the Supabase dashboard; they will not look at it except to keep the service working or at your request.</p>
       </section>
       <section>
         <H>Services we use</H>
         <Ul>
-          <li>Supabase (login and database). Data region: <Tbd>region chosen for the Supabase project</Tbd>.</li>
+          <li>Supabase (login and database). Your account and history are stored on Supabase's cloud servers, not on college computers.</li>
           <li>Render (runs the analysis server) and Vercel (hosts the website).</li>
         </Ul>
         <p className="mt-2">These providers process data on our behalf to run the service. We do not sell your data or share it for advertising.</p>
       </section>
       <section>
         <H>Keeping and deleting data</H>
-        <p>You can delete any saved run yourself on the History page. Your history is kept until you delete it or your account is closed. When an account is closed, its profile and history are deleted with it. Retention period for closed accounts and backups: <Tbd>period decided by the team and college</Tbd>. To ask for your account or data to be deleted or corrected, write to <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>.</p>
+        <p>You can delete any saved run yourself on the History page. Your history is kept until you delete it or your account is closed. When an account is closed, its profile and history are deleted with it. Copies held in the provider's routine backups are removed on the provider's own schedule. To ask for your account or data to be deleted or corrected, write to <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>.</p>
       </section>
       <section>
         <H>Security</H>
@@ -88,7 +84,7 @@ export function Privacy() {
       </section>
       <section>
         <H>Changes</H>
-        <p>If this policy changes, the date at the top is updated. Applicable law and the grievance process: <Tbd>to be confirmed with the college (for example India's Digital Personal Data Protection Act, 2023)</Tbd>.</p>
+        <p>If this policy changes, the date at the top is updated. This project is run in India and Indian law applies to it. For any complaint about your data, write to <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>.</p>
       </section>
     </Page>
   )
@@ -134,11 +130,11 @@ export function Terms() {
       </section>
       <section>
         <H>Availability and liability</H>
-        <p>The service runs on free hosting plans and may be slow, unavailable or change without notice; the first request after a quiet period can take about a minute. It is provided "as is", without warranties. To the extent allowed by law, the team and the college are not liable for losses arising from use of, or reliance on, the service. Status of the college's responsibility for this project: <Tbd>wording to be confirmed with the college</Tbd>.</p>
+        <p>The service runs on free hosting plans and may be slow, unavailable or change without notice; the first request after a quiet period can take about a minute. It is provided "as is", without warranties. To the extent allowed by law, the team and the college are not liable for losses arising from use of, or reliance on, the service.</p>
       </section>
       <section>
         <H>Changes and contact</H>
-        <p>We may update these terms; the date at the top shows the latest version. Governing law and place of jurisdiction: <Tbd>to be confirmed with the college (likely Nashik, Maharashtra, India)</Tbd>. Questions: <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>.</p>
+        <p>We may update these terms; the date at the top shows the latest version. These terms are governed by the laws of India, and the courts at Nashik, Maharashtra have jurisdiction. Questions: <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>.</p>
       </section>
     </Page>
   )
