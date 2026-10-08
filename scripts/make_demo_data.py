@@ -99,6 +99,7 @@ def relabel(p):
     walk(p["optimization"])
     # the public demo has no Emission factors or Data & QA page, so their data is not shipped
     p["factors"] = []
+    p["energy_audit"] = None   # real campus area / AC inventory must never reach the public site
     p["qa"] = {"overall": "n/a", "sections": [], "markdown": ""}
     return p
 

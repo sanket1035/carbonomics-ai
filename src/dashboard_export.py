@@ -20,6 +20,7 @@ import pandas as pd
 from emission_factors import EMISSION_FACTORS, REPORT_FOOTPRINT_TCO2E, REPORT_SOURCE
 from simulation import baseline as sim_baseline, simulate
 from optimization import load_measures, optimize as opt_optimize, budget_sweep as opt_sweep
+from energy_audit import build_audit
 
 OUT_FILE = "outputs/dashboard_real.json"   # real data: NOT in the public site; the public demo uses scripts/make_demo_data.py
 
@@ -256,6 +257,14 @@ def _build_optimization_payload(real_df, root: str = ".") -> dict:
     }
 
 
+def _build_energy_audit_payload(root: str = "."):
+    """Energy Audit block. None when the campus facts / AC inventory files are absent (the public demo build)."""
+    needed = [os.path.join(root, "data", "real", f) for f in ("campus_facts.csv", "ac_inventory.csv")]
+    if not all(os.path.exists(f) for f in needed):
+        return None
+    return build_audit(root)
+
+
 def build_payload(root: str = ".") -> dict:
 
     p = lambda *a: os.path.join(root, *a)  # noqa: E731
@@ -336,6 +345,7 @@ def build_payload(root: str = ".") -> dict:
         "solar": build_solar_payload(solar, float(real["electricity_kwh"].sum())),
         "simulation": _build_simulation_payload(real),
         "optimization": _build_optimization_payload(real, root),
+        "energy_audit": _build_energy_audit_payload(root),
     }
 
 
