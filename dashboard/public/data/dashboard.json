@@ -1889,6 +1889,247 @@
    },
    "note": "Fake inventory. The corrected figures depend on the ASSUMED COP and on fake operating days and hours."
   },
+  "suggestions": [
+   {
+    "id": "ac_setpoint",
+    "priority": 1,
+    "group": "Waste candidate",
+    "title": "Keep AC at 24 degC or higher",
+    "where": "Every air-conditioned site",
+    "why": "Air-conditioning is the largest end-use that can be estimated from campus data, and the rule of thumb is simple: each degree of setpoint raised saves energy.",
+    "status": "scenario",
+    "typical_saving": "About 6% of AC energy per 1 degC raised (24 degC instead of 20 degC is about 24%)",
+    "typical_saving_pct": 0.06,
+    "saving_source": "BEE Line newsletter, Issue 7 (BEE)",
+    "source_date": "Apr-Jun 2020",
+    "evidence_scope": "General statement by BEE for room air-conditioners; not measured on this campus",
+    "needs": "Current setpoints (a quick walk-through is enough)",
+    "campus_evidence": [
+     "Corrected AC estimate: 143,810 kWh a year (107,858 to 172,572 kWh for COP 4.0 to 2.5), about 29% of purchased electricity."
+    ],
+    "campus_number": {
+     "label": "Raise setpoint by 1 degC",
+     "kwh_low": 6471.5,
+     "kwh_central": 8628.6,
+     "kwh_high": 10354.3,
+     "tco2e_central": 6.13,
+     "note": "Six percent of the corrected AC estimate; the AC estimate itself uses an ASSUMED COP"
+    }
+   },
+   {
+    "id": "ac_hours_top",
+    "priority": 2,
+    "group": "Waste candidate",
+    "title": "Run AC only when the room is in use (timers or key-card switching)",
+    "where": "The air-conditioned site with the most AC hours",
+    "why": "Listed AC hours at the biggest site are long. Every hour of AC that runs in an empty room is waste, whatever the benchmark says.",
+    "status": "scenario",
+    "typical_saving": "Not a published percentage; the number shown is a formula (hours saved x units x power)",
+    "typical_saving_pct": null,
+    "saving_source": "Formula from the AC inventory",
+    "source_date": "2026",
+    "evidence_scope": "Uses the listed operating days and hours, which are unverified",
+    "needs": "Real hours of use per site (room booking or a simple log)",
+    "campus_evidence": [
+     "Demo guest house: 12 units, 12 hours a day listed, 48,957 kWh a year (corrected estimate, 34% of campus AC)."
+    ],
+    "campus_number": {
+     "label": "Demo guest house: 1 hour a day less AC",
+     "kwh_low": 3059.8,
+     "kwh_central": 4079.7,
+     "kwh_high": 4895.7,
+     "tco2e_central": 2.9,
+     "note": "Formula on the listed days and hours and the ASSUMED COP"
+    }
+   },
+   {
+    "id": "ac_hours_second",
+    "priority": 3,
+    "group": "Waste candidate",
+    "title": "Match AC hours to working hours",
+    "where": "The site with the second most AC hours",
+    "why": "Same idea for the next largest site: office-type AC should follow office hours.",
+    "status": "scenario",
+    "typical_saving": "Not a published percentage; the number shown is a formula (hours saved x units x power)",
+    "typical_saving_pct": null,
+    "saving_source": "Formula from the AC inventory",
+    "source_date": "2026",
+    "evidence_scope": "Uses the listed operating days and hours, which are unverified",
+    "needs": "Real hours of use per site",
+    "campus_evidence": [
+     "Demo block B: 10 units, 9 hours a day listed, 45,897 kWh a year (corrected estimate, 32% of campus AC)."
+    ],
+    "campus_number": {
+     "label": "Demo block B: 1 hour a day less AC",
+     "kwh_low": 3824.7,
+     "kwh_central": 5099.6,
+     "kwh_high": 6119.6,
+     "tco2e_central": 3.62,
+     "note": "Formula on the listed days and hours and the ASSUMED COP"
+    }
+   },
+   {
+    "id": "occupancy_sensors",
+    "priority": 4,
+    "group": "Waste candidate",
+    "title": "Occupancy sensors for lights",
+    "where": "Hostel washrooms, corridors, stairs and other common areas",
+    "why": "Lights in common areas often stay on when nobody is there. A sensor switches them off by itself, the way malls do it.",
+    "status": "typical",
+    "typical_saving": "On average about 24% of lighting energy",
+    "typical_saving_pct": 0.24,
+    "saving_source": "Williams et al., LBNL-5095E (240 estimates from 88 studies)",
+    "source_date": "Sep 2011",
+    "evidence_scope": "Mostly commercial buildings, not India; a hostel may differ",
+    "needs": "Lighting load (fitting count x watt x hours) to turn the % into kWh",
+    "campus_evidence": [
+     "Hostel and mess floor area is 3,000 m2, 15% of the campus built-up area."
+    ],
+    "campus_number": null
+   },
+   {
+    "id": "led_retrofit",
+    "priority": 5,
+    "group": "Waste candidate",
+    "title": "Replace old tubes and bulbs with LED",
+    "where": "Wherever old fluorescent, CFL or incandescent fittings are still in use",
+    "why": "Saving depends only on the old and new wattage of each fitting, so it can be worked out exactly once the fittings are counted.",
+    "status": "typical",
+    "typical_saving": "Formula: (old watts - new watts) / old watts. No published average is used",
+    "typical_saving_pct": null,
+    "saving_source": "Formula",
+    "source_date": "",
+    "evidence_scope": "No campus fitting count exists yet",
+    "needs": "Fitting count, old and new watt, daily hours",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "bldc_fans",
+    "priority": 6,
+    "group": "Waste candidate",
+    "title": "BLDC fans in classrooms, labs and hostel rooms",
+    "where": "High-use rooms with ceiling fans",
+    "why": "A BLDC fan draws far less power than an ordinary ceiling fan for the same air.",
+    "status": "typical",
+    "typical_saving": "28-32 W per BLDC fan against 70-75 W for an ordinary fan, about 54% to 63% less power per fan",
+    "typical_saving_pct": null,
+    "saving_source": "EESL, reported by T&D India",
+    "source_date": "12 Sep 2022",
+    "evidence_scope": "Manufacturer and programme figures, not measured on this campus",
+    "needs": "Fan count and daily hours",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "pumps",
+    "priority": 7,
+    "group": "Waste candidate",
+    "title": "Check water pumps: run time and efficiency",
+    "where": "Water pumps (borewell, tank, fire-fighting)",
+    "why": "Pumps that run longer than needed, or run at poor efficiency, waste energy quietly. Timers, level controls or a better pump can cut it.",
+    "status": "typical",
+    "typical_saving": "About 20% of pumping energy through equipment and control changes",
+    "typical_saving_pct": 0.2,
+    "saving_source": "Indian Infrastructure (trade press)",
+    "source_date": "5 Jan 2021",
+    "evidence_scope": "Weak source: a general statement in an article, not a study",
+    "needs": "Pump rating (kW) and daily running hours",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "solar_expand",
+    "priority": 8,
+    "group": "Cleaner supply",
+    "title": "Add more rooftop solar",
+    "where": "Rooftop and shed areas not yet used",
+    "why": "The campus already has rooftop solar, and its yield is measured, so the existing system is the best guide to what more panels would give. Wind is not suitable here.",
+    "status": "typical",
+    "typical_saving": "The Optimization page models solar in blocks; the measured yield of the existing system should be used, not a general figure",
+    "typical_saving_pct": null,
+    "saving_source": "Measured data from the campus",
+    "source_date": "",
+    "evidence_scope": "Needs the installed kWp of the existing system and the free roof area",
+    "needs": "Installed kWp of the existing system and free roof area",
+    "campus_evidence": [
+     "Existing rooftop solar generated 13,096 kWh in the last 12 months, 2.6% of purchased electricity. It is reported separately and not subtracted from the purchased total."
+    ],
+    "campus_number": null
+   },
+   {
+    "id": "solar_water",
+    "priority": 9,
+    "group": "Cleaner supply",
+    "title": "Solar water heater, if hot water comes from electric geysers",
+    "where": "Hostel bathrooms and kitchens",
+    "why": "Only useful if hot water is made with electricity today. If the hostel uses another fuel, skip this.",
+    "status": "typical",
+    "typical_saving": "About 1,500 kWh of electricity a year for each 100 litres per day of hot water, when it replaces an electric geyser",
+    "typical_saving_pct": null,
+    "saving_source": "HAREDA (Haryana), Solar Water Heating System page",
+    "source_date": "Updated 8 Jun 2022",
+    "evidence_scope": "Residential figure for Haryana, not measured here",
+    "needs": "Whether hostels use electric geysers and the litres of hot water per day",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "dg_scheduling",
+    "priority": 10,
+    "group": "Waste candidate",
+    "title": "Cut unnecessary generator running",
+    "where": "The diesel generator",
+    "why": "Diesel is a small share of campus emissions, so this is a low priority. Still, testing and idle running can be reduced. There is no benchmark for generators, so this is a what-if, not a waste claim.",
+    "status": "what_if",
+    "typical_saving": "No published percentage; use the what-if on the Simulation page",
+    "typical_saving_pct": null,
+    "saving_source": "None (no benchmark)",
+    "source_date": "",
+    "evidence_scope": "",
+    "needs": "Reason for each run (outage or test) from the generator log",
+    "campus_evidence": [
+     "Generator diesel: 604 litres a year = 1.75 tCO2e, only 0.5% of the electricity emissions. Highest month: 2025-04 with 77 litres."
+    ],
+    "campus_number": null
+   },
+   {
+    "id": "switch_off_routine",
+    "priority": 11,
+    "group": "Waste candidate",
+    "title": "Switch-off routine: lights, fans and AC off in empty rooms",
+    "where": "Classrooms, labs, offices and hostels after hours",
+    "why": "No equipment needed. A simple end-of-day walk-through catches the waste that no meter can see.",
+    "status": "practice",
+    "typical_saving": "No figure claimed",
+    "typical_saving_pct": null,
+    "saving_source": "None",
+    "source_date": "",
+    "evidence_scope": "",
+    "needs": "Nothing; start with a weekly checklist",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "submetering",
+    "priority": 12,
+    "group": "Enabler",
+    "title": "Put meters on the main feeders",
+    "where": "The Institute Building and the hostels",
+    "why": "Most campus electricity has no end-use split today. Meters turn every guess on this page into a measured number, so this comes first for any real saving claim.",
+    "status": "enabler",
+    "typical_saving": "No saving claimed; it makes the others measurable",
+    "typical_saving_pct": null,
+    "saving_source": "None",
+    "source_date": "",
+    "evidence_scope": "",
+    "needs": "Feeder-level meters (one-time)",
+    "campus_evidence": [
+     "Only the AC load can be estimated, about 29% of purchased electricity. The other 71% has no end-use split."
+    ],
+    "campus_number": null
+   }
+  ],
   "caveats": [
    "No official BEE/ECBC EPI exists for educational buildings: every benchmark here is a proxy.",
    "The climate-zone mapping of the BEE bands is inferred from extracted PDF text, not checked against the original.",

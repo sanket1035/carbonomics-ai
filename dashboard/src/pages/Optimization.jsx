@@ -38,7 +38,7 @@ const BASIS_TONE = {
 }
 function BasisBadge({ basis }) {
   const tone = BASIS_TONE[basis?.toUpperCase()] ?? 'slate'
-  return <Badge tone={tone}>{basis || 'TBD'}</Badge>
+  return <Badge tone={tone}>{basis || 'no basis'}</Badge>
 }
 
 // ── JS knapsack solver ────────────────────────────────────────────────────────
@@ -674,8 +674,8 @@ export default function Optimization({ data }) {
             <Callout title="Limitations & assumptions">
               <ul className="mt-1 list-disc pl-4 space-y-1 text-xs leading-relaxed">
                 <li>Savings modelled as static annual averages — seasonal variation ignored.</li>
-                <li>Additive electricity savings are capped at the baseline total and per end-use (AC = 697,296 kWh, ESTIMATE from sheet 4_AC_Inventory).</li>
-                <li>Lighting end-use is TBD — no lighting inventory in this demo. LED measures are excluded until data is provided.</li>
+                <li>Additive electricity savings are capped at the baseline total and per end-use (AC = 697,296 kWh, the listed figure from the AC inventory). The Energy Audit page shows why this figure is probably too high and gives a corrected estimate.</li>
+                <li>Lighting end-use is not known: there is no lighting inventory. LED measures are left out until that data exists.</li>
                 <li>Cost and saving inputs must come from the owner (vendor quote / audit); nothing is invented.</li>
                 <li>MILP assumes linear scaling per unit. Non-linearities need additional modelling.</li>
                 <li>Payback not computed — electricity tariff and diesel price not yet provided.</li>

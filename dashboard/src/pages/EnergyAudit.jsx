@@ -10,6 +10,37 @@ function Verified({ ok }) {
   return ok ? <Badge tone="green">verified</Badge> : <Badge tone="amber">proxy, not verified</Badge>
 }
 
+const STATUS = {
+  scenario: ['blue', 'Scenario: number from campus data'],
+  what_if: ['blue', 'What-if, no benchmark'],
+  typical: ['amber', 'Typical saving only, no campus number'],
+  practice: ['green', 'No equipment needed'],
+  enabler: ['slate', 'Enabler, no saving claimed'],
+}
+
+function Suggestion({ s, n }) {
+  const [tone, label] = STATUS[s.status] ?? ['slate', s.status]
+  const num = s.campus_number
+  return (
+    <li className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <h4 className="font-semibold text-slate-900 dark:text-slate-100">{n}. {s.title}</h4>
+        <Badge tone={tone}>{label}</Badge>
+      </div>
+      <p className="muted mt-1 text-xs">{s.group} · Where: {s.where}</p>
+      <p className="mt-2 text-sm">{s.why}</p>
+      {s.campus_evidence.map((e) => <p key={e} className="mt-1.5 text-sm"><b>Campus data:</b> {e}</p>)}
+      {num && (
+        <p className="mt-2 rounded-lg bg-sky-50 px-3 py-2 text-sm text-sky-900 dark:bg-sky-950/40 dark:text-sky-200">
+          <b>{num.label}:</b> about {fmt(num.kwh_central)} kWh a year ({fmt(num.kwh_low)} to {fmt(num.kwh_high)}), {fmt(num.tco2e_central, 1)} tCO₂e. <span className="opacity-80">{num.note}.</span>
+        </p>
+      )}
+      <p className="mt-2 text-xs"><b>Saving basis:</b> {s.typical_saving}.{s.saving_source !== 'None' && <> Source: {s.saving_source}{s.source_date ? `, ${s.source_date}` : ''}.</>}{s.evidence_scope && <> {s.evidence_scope}.</>}</p>
+      {s.needs && <p className="muted mt-1 text-xs"><b>To turn this into a campus number:</b> {s.needs}.</p>}
+    </li>
+  )
+}
+
 function EpiChart({ a, refs }) {
   const t = useChartTheme()
   const rows = [
@@ -134,6 +165,18 @@ export default function EnergyAudit({ data }) {
         )}
         <p className="muted mt-1 text-xs">{ac.note}</p>
       </Card>
+
+      {ea.suggestions?.length > 0 && (
+        <Card title="Where the waste can be, and what to do" subtitle="Suggestions in priority order. Not savings claims.">
+          <Callout tone="blue" title="How to read this">
+            The campus has no meters for lights, fans or pumps, so nobody can say how many units each one uses. A number is shown only where campus data allows it (air-conditioning, generator, solar).
+            Everywhere else you see the typical saving published by a named source, and what data would turn it into a campus number. Being under the benchmark does not mean nothing is wasted.
+          </Callout>
+          <ol className="mt-4 space-y-3">
+            {ea.suggestions.map((s, i) => <Suggestion key={s.id} s={s} n={i + 1} />)}
+          </ol>
+        </Card>
+      )}
 
       <Card title="Limits of this page">
         <ul className="list-disc space-y-1 pl-5 text-sm">
