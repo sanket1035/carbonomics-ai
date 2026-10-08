@@ -122,7 +122,7 @@ const readyMeasures = (opt.measures ?? [])
 const caps = {
   total_electricity: data.kpis?.electricity_kwh ?? null,
   total_diesel: data.kpis?.diesel_litres ?? null,
-  ac_end_use: 697296,
+  ac_end_use: 233054,
 }
 
 const sweep = opt.budget_sweep ?? []
