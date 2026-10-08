@@ -158,4 +158,5 @@ def test_api_report_includes_the_annual_pages_by_default_and_can_skip_them():
     on = client.post("/api/report", json={"periods": periods, "granularity": "weekly"})
     off = client.post("/api/report", json={"periods": periods, "granularity": "weekly", "include_campus_inventory": False})
     assert on.status_code == off.status_code == 200
-    assert pages(on.content) == pages(off.content) + 2
+    # 2 yearly Scope 1/2/3 pages, then the Energy Audit pages (result, AC check, 2 or more suggestion pages)
+    assert pages(on.content) >= pages(off.content) + 2 + 4

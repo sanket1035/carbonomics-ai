@@ -280,7 +280,26 @@ GLOSSARY = (
 )
 
 
+def _page_frame(c: canvas.Canvas) -> None:
+    """Border drawn on every page after the cover: a teal rule with a thin inner line and a short teal corner accent."""
+    m = 20
+    c.saveState()
+    c.setStrokeColor(TEAL)
+    c.setLineWidth(1.2)
+    c.rect(m, m, W - 2 * m, H - 2 * m, stroke=1, fill=0)
+    c.setStrokeColor(HexColor("#99f6e4"))
+    c.setLineWidth(0.4)
+    c.rect(m + 4, m + 4, W - 2 * m - 8, H - 2 * m - 8, stroke=1, fill=0)
+    c.setStrokeColor(TEAL_DARK)
+    c.setLineWidth(3)
+    for x, y, dx, dy in ((m, m, 1, 1), (W - m, m, -1, 1), (m, H - m, 1, -1), (W - m, H - m, -1, -1)):
+        c.line(x, y, x + dx * 26, y)
+        c.line(x, y, x, y + dy * 26)
+    c.restoreState()
+
+
 def _page_header(c: canvas.Canvas, page_no: int) -> None:
+    _page_frame(c)
     left, right = 48, W - 48
     _mark(c, left, H - 62, 26)
     c.setFillColor(TEAL_DARK)
@@ -294,7 +313,8 @@ def _page_header(c: canvas.Canvas, page_no: int) -> None:
     c.line(left, H - 72, right, H - 72)
     c.setFillColor(MUTED)
     c.setFont("Body", 9)
-    c.drawCentredString(W / 2, 30, str(page_no))
+    c.drawString(left, 34, "Carbonomics-AI · KKWIEER, Nashik")
+    c.drawRightString(right, 34, f"Page {page_no}")
 
 
 def draw_details_page(c: canvas.Canvas, info: CoverInfo, d: ReportDetails) -> None:
