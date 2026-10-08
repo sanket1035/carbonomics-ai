@@ -550,9 +550,11 @@ def _factor_text(analysis: dict) -> str:
 
 def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = None, scope3: Optional[dict] = None,
                       prepared_for: str = "", data_source: str = "", generated_on: str = "",
-                      inventory: Optional[dict] = None) -> str:
+                      inventory: Optional[dict] = None, energy_audit: Optional[dict] = None) -> str:
     """Cover, About, At a glance, Method, Results, the yearly campus footprint (when `inventory` is given), Trend, Sources, Forecast and Training (when forecast ran), What-if,
-    Grid factor, plus Optimization and Recommended steps when a plan is given, then Data and limits."""
+    Grid factor, plus Optimization and Recommended steps when a plan is given, then Data and limits.
+    With `energy_audit` (energy_audit.build_audit) the campus Energy Audit pages follow the yearly campus pages: result, AC check, suggestions.
+    Every page after the cover has a border."""
     from report_cover import CoverInfo, ReportDetails, draw_cover, draw_details_page
     inp = analysis["input"]
     sources = [k for k in ("electricity_kwh", "diesel_litres") if k in inp["columns_used"]]
@@ -586,6 +588,14 @@ def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = 
         ra.draw_campus_notes_page(c, inventory, n + 1)
         c.showPage()
         n += 2
+    if energy_audit:
+        import report_audit as rau
+        rau.draw_audit_page(c, energy_audit, n)
+        c.showPage()
+        rau.draw_ac_page(c, energy_audit, n + 1)
+        c.showPage()
+        n += 2 + rau.draw_suggestion_pages(c, energy_audit, n + 2)
+        c.showPage()
     rx.draw_trend_page(c, analysis, n)
     c.showPage()
     rx.draw_sources_page(c, analysis, n + 1)

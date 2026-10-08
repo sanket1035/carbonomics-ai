@@ -33,6 +33,7 @@ sys.path.append(os.path.join(ROOT, "src"))
 
 import annual_inventory  # noqa: E402
 import emission_factors  # noqa: E402
+import energy_audit  # noqa: E402
 import factor_change  # noqa: E402
 import upload_analysis  # noqa: E402
 import upload_optimization  # noqa: E402
@@ -233,7 +234,18 @@ class ReportRequest(BaseModel):
     prepared_for: str = Field("", max_length=200)
     budget_inr: Optional[float] = None       # with measures: adds the Optimization and Recommended steps pages
     measures: List[MeasureIn] = Field(default_factory=list, max_length=upload_optimization.MAX_MEASURES)
-    include_campus_inventory: bool = True    # yearly Scope 1, 2 and 3 pages (KKWIEER master data), static
+    include_campus_inventory: bool = True    # yearly Scope 1, 2 and 3 pages and the Energy Audit pages (KKWIEER master data), static
+
+
+def _report_energy_audit() -> Optional[dict]:
+    """Campus Energy Audit for the report. None when the campus files are not on the server; a failure must not block the report."""
+    needed = [os.path.join(ROOT, "data", "real", f) for f in ("campus_facts.csv", "ac_inventory.csv")]
+    if not all(os.path.exists(f) for f in needed):
+        return None
+    try:
+        return energy_audit.build_audit(ROOT)
+    except Exception:  # noqa: BLE001
+        return None
 
 
 @app.post("/api/report")
@@ -268,12 +280,13 @@ def report(req: ReportRequest, user: User = Depends(current_user)) -> Response:
             plan = upload_optimization.optimize_upload(periods, req.granularity, req.budget_inr, [m.model_dump() for m in req.measures])
         except upload_analysis.UploadError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+    audit = _report_energy_audit() if req.include_campus_inventory else None
     today = date.today()
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "report.pdf")
         build_full_report(path, analysis, plan, None, prepared_for=req.prepared_for, data_source=req.file_name,
                           generated_on=f"{today.day} {today.strftime('%B %Y')}",
-                          inventory=annual_inventory.load_inventory() if req.include_campus_inventory else None)
+                          inventory=annual_inventory.load_inventory() if req.include_campus_inventory else None, energy_audit=audit)
         pdf = open(path, "rb").read()
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="carbon-footprint-report.pdf"'})
 

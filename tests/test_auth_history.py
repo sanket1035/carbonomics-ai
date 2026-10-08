@@ -283,9 +283,9 @@ def test_report_is_a_pdf_for_logged_in_users_only_and_includes_the_plan(db):
     assert r.status_code == 200 and r.headers["content-type"] == "application/pdf"
     pages = pypdf.PdfReader(io.BytesIO(r.content)).pages
     text = "\n".join(p.extract_text() for p in pages)
-    assert len(pages) == 15 and "Recommended steps" in text and "Full campus footprint" in text and "Dr. A. B. Name" in text and "college.xlsx" in text
+    assert len(pages) >= 19 and "Energy Audit: suggestions" in text and "Recommended steps" in text and "Full campus footprint" in text and "Dr. A. B. Name" in text and "college.xlsx" in text
     r2 = client.post("/api/report", headers=bearer(), json={k: v for k, v in body.items() if k not in ("budget_inr", "measures")})
-    assert len(pypdf.PdfReader(io.BytesIO(r2.content)).pages) == 13
+    assert len(pypdf.PdfReader(io.BytesIO(r2.content)).pages) == len(pages) - 2          # without the plan: no Optimization and Recommended steps pages
     assert db.requests == []                                       # nothing is stored for a report
 
 

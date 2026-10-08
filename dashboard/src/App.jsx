@@ -14,6 +14,7 @@ import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
 import { Privacy, Terms } from './pages/Legal.jsx'
 import { authConfigured, signOut, useAuth } from './auth.js'
+import { api } from './api.js'
 
 const PAGES = [
   { id: 'overview', label: 'Overview', icon: Gauge, C: Overview, demo: true },
@@ -49,6 +50,14 @@ const readSaved = () => {
 }
 const writeSaved = (a) => {
   try { sessionStorage.setItem(SAVED_KEY, JSON.stringify(a)) } catch { /* too big or storage blocked: fine */ }
+}
+// The optimization plan that goes into the PDF report is kept the same way, so a reload does not drop it.
+const PLAN_KEY = 'carbonomics-last-plan'
+const readPlan = () => {
+  try { return JSON.parse(sessionStorage.getItem(PLAN_KEY)) } catch { return null }
+}
+const writePlan = (p) => {
+  try { p ? sessionStorage.setItem(PLAN_KEY, JSON.stringify(p)) : sessionStorage.removeItem(PLAN_KEY) } catch { /* storage blocked: fine */ }
 }
 
 export default function App() {
@@ -94,7 +103,8 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [analysis, setAnalysis] = useState(readSaved)   // { result, fileName } of the file the user analysed or opened from History
-  const [plan, setPlan] = useState(null)           // optimization inputs, added to the PDF report
+  const [plan, setPlanState] = useState(readPlan)  // optimization inputs, added to the PDF report
+  const setPlan = (p) => { setPlanState(p); writePlan(p) }
   const mine = Boolean(session) && !demo                    // logged-in users see their own data, visitors see the fake demo
 
   useEffect(() => {
@@ -113,9 +123,18 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const Page = current.C
   const needsData = current.needsData !== false && !mine
   const showResult = (result, fileName) => { setAnalysis({ result, fileName }); setPlan(null); writeSaved({ result, fileName }) }
+  // Opening a saved analysis brings back the newest optimization plan saved for it, so the report includes it again.
+  const restorePlan = async (runId) => {
+    try {
+      const runs = await api('/api/runs?limit=200')
+      const saved = runs.find((r) => r.kind === 'optimization' && r.parent_run_id === runId && r.input?.measures?.length)
+      if (saved) setPlan({ budget_inr: saved.input.budget_inr, measures: saved.input.measures })
+    } catch { /* the report simply has no plan until "Find best plan" is run */ }
+  }
   const openAnalysis = (run) => {
     const fileName = run.input?.file_name || run.title || ''
     showResult({ ...run.result, input: { ...run.result.input, file_name: fileName }, run: { saved: true, id: run.id, error: null, title: run.title, opened: true } }, fileName)
+    restorePlan(run.id)
     go('overview')
   }
   const MINE = { overview: MyOverview, trends: MyTrends, forecast: MyForecast, simulation: MySimulation, optimization: MyOptimization, energyaudit: MyEnergyAudit, factorchange: FactorChange }
