@@ -45,6 +45,24 @@ def fake_monthly(rng):
             pd.DataFrame({"month": months, "solar_kwh": solar.astype(int), "source": FAKE}))
 
 
+def fake_audit_inputs(tmp):
+    """FAKE built-up area and AC inventory for the demo Energy Audit page (same file layout as the real ones)."""
+    facts = pd.DataFrame([
+        ("built_up_area", 20000.0, "m2", "FAKE demo figure", "demo"),
+        ("guest_house_built_up_area", 600.0, "m2", "FAKE demo figure", "demo"),
+        ("total_persons", 4500, "persons", "FAKE demo figure", "demo"),
+    ], columns=["parameter", "value", "unit", "source", "master_data_sheet"])
+    rows = []
+    for name, units, ton, days, hours in [("Demo block A", 8, 1.5, 290, 9), ("Demo block B", 10, 1.5, 290, 9),
+                                          ("Demo guest house", 12, 1.0, 290, 12), ("Demo office", 4, 1.0, 290, 9)]:
+        listed = round(ton * 3.517, 2)   # the same cooling-capacity mix-up the audit checks for
+        rows.append((name, units, ton, listed, days, hours, round(units * listed * days * hours, 1), "FAKE demo figure", "demo"))
+    ac = pd.DataFrame(rows, columns=["location", "units", "capacity_ton", "listed_power_per_unit_kw", "operating_days_per_year",
+                                     "daily_hours", "modelled_annual_kwh", "source", "master_data_sheet"])
+    facts.to_csv(os.path.join(tmp, "data/real/campus_facts.csv"), index=False)
+    ac.to_csv(os.path.join(tmp, "data/real/ac_inventory.csv"), index=False)
+
+
 def build(tmp):
     for d in ("data/real", "data/inputs", "data/synthetic", "data/processed", "outputs/forecast", "outputs/plots", "outputs/models"):
         os.makedirs(os.path.join(tmp, d), exist_ok=True)
@@ -53,6 +71,7 @@ def build(tmp):
     real.to_csv(os.path.join(tmp, "data/real/real_monthly_2025.csv"), index=False)
     solar.to_csv(os.path.join(tmp, "data/real/real_solar_monthly.csv"), index=False)
     open(os.path.join(tmp, "data/inputs/optimization_measures.csv"), "w").write(FAKE_MEASURES)
+    fake_audit_inputs(tmp)
     os.chdir(tmp)
     import make_synthetic_weekly
     from clean_data import clean_dataset
@@ -99,7 +118,14 @@ def relabel(p):
     walk(p["optimization"])
     # the public demo has no Emission factors or Data & QA page, so their data is not shipped
     p["factors"] = []
-    p["energy_audit"] = None   # real campus area / AC inventory must never reach the public site
+    ea = p["energy_audit"]   # built from the FAKE area and AC inventory above; text that names the real campus is replaced
+    ea["period"] = "Demo year (fake)"
+    ea["basis"] = "FAKE monthly electricity / FAKE built-up area; formula only, no ML"
+    ea["zone_note"] = ("The climate zone of a real site matters: the 5-star cut-off is 40 (Composite) or 45 (Warm and Humid) "
+                       "kWh/m2/year. The demo uses Composite.")
+    ea["actual"]["area_source"] = "FAKE demo figure"
+    ea["ac"]["basis"] = "FAKE demo inventory, not metered"
+    ea["ac"]["note"] = "Fake inventory. The corrected figures depend on the ASSUMED COP and on fake operating days and hours."
     p["qa"] = {"overall": "n/a", "sections": [], "markdown": ""}
     return p
 

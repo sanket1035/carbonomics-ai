@@ -44,7 +44,7 @@ BENCHMARKS = {
         "unit": BENCHMARK_UNIT,
         "source": BEE_OFFICE_SOURCE,
         "version": BEE_OFFICE_VERSION,
-        "basis": "Proxy: office scheme applied to an educational campus; zone depends on DEFAULT_ZONE",
+        "basis": "Proxy: office scheme applied to an educational campus; the cut-off depends on the climate zone",
         "verified": False,
     },
     "shunya_net_zero": {

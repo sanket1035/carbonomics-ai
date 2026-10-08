@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BarChart3, FlaskConical, Scale, Gauge, History as HistoryIcon, Home, LineChart as LineIcon, LogOut, Lock, Menu, Moon, Sun, Target, Upload as UploadIcon, X } from 'lucide-react'
+import { BarChart3, ClipboardCheck, FlaskConical, Scale, Gauge, History as HistoryIcon, Home, LineChart as LineIcon, LogOut, Lock, Menu, Moon, Sun, Target, Upload as UploadIcon, X } from 'lucide-react'
 import { Synthetic, ThemeCtx } from './ui.jsx'
 import Overview from './pages/Overview.jsx'
 import Trends from './pages/Trends.jsx'
@@ -7,6 +7,7 @@ import Forecast from './pages/Forecast.jsx'
 import Simulation from './pages/Simulation.jsx'
 import Optimization from './pages/Optimization.jsx'
 import FactorChange from './pages/FactorChange.jsx'
+import EnergyAudit, { MyEnergyAudit } from './pages/EnergyAudit.jsx'
 import Upload, { MyForecast, MyOptimization, MyOverview, MySimulation, MyTrends } from './pages/Upload.jsx'
 import HistoryPage from './pages/History.jsx'
 import Landing from './pages/Landing.jsx'
@@ -20,6 +21,7 @@ const PAGES = [
   { id: 'forecast', label: 'Forecast', icon: BarChart3, C: Forecast, demo: true },
   { id: 'simulation', label: 'Simulation', icon: FlaskConical, C: Simulation, demo: true },
   { id: 'optimization', label: 'Optimization', icon: Target, C: Optimization, demo: true },
+  { id: 'energyaudit', label: 'Energy Audit', icon: ClipboardCheck, C: EnergyAudit, demo: true },
   { id: 'factorchange', label: 'Why it changed', icon: Scale, C: Overview, demo: true, mineOnly: true },
   { id: 'upload', label: 'Upload your data', icon: UploadIcon, C: Upload, locked: true, needsData: false },
   { id: 'history', label: 'History', icon: HistoryIcon, C: HistoryPage, locked: true, needsData: false },
@@ -116,7 +118,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
     showResult({ ...run.result, input: { ...run.result.input, file_name: fileName }, run: { saved: true, id: run.id, error: null, title: run.title, opened: true } }, fileName)
     go('overview')
   }
-  const MINE = { overview: MyOverview, trends: MyTrends, forecast: MyForecast, simulation: MySimulation, optimization: MyOptimization, factorchange: FactorChange }
+  const MINE = { overview: MyOverview, trends: MyTrends, forecast: MyForecast, simulation: MySimulation, optimization: MyOptimization, energyaudit: MyEnergyAudit, factorchange: FactorChange }
   const MyPage = mine ? MINE[current.id] : null
 
   // Logged-in users get the result pages only once they have a file analysed; visitors get the fake-data demo.
