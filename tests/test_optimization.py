@@ -179,7 +179,7 @@ def test_measure_impact_raises_on_needs_input(real_df):
 
 
 def test_measure_impact_pct_of_ac_end_use(real_df):
-    """5% saving on ac_end_use = 697296 × 0.05 kWh."""
+    """5% saving on ac_end_use × 0.05 kWh."""
     m = {
         **_fake_elec_measure("t_ac", "AC 5%", saving_kwh=0, capex=200_000, cap_basis="ac_end_use"),
         "saving_type": "pct_of_activity",
@@ -376,7 +376,7 @@ def test_diesel_saved_cannot_exceed_baseline(real_df):
 
 
 def test_ac_saving_cannot_exceed_ac_end_use(real_df):
-    """AC measures: combined saving ≤ AC end-use (697296 kWh)."""
+    """AC measures: combined saving ≤ AC end-use (AC_END_USE_KWH_YR)."""
     m = {
         **_fake_elec_measure("ac_cap", "AC 200%", saving_kwh=0, capex=10_000, cap_basis="ac_end_use"),
         "saving_type": "pct_of_activity",
@@ -531,3 +531,12 @@ def test_optimization_module_importable():
     assert hasattr(optimization, "greedy")
     assert hasattr(optimization, "budget_sweep")
     assert hasattr(optimization, "measure_impact")
+
+
+def test_ac_end_use_matches_the_energy_audit_corrected_estimate():
+    """The optimizer's AC cap is the Energy Audit's central corrected estimate, not the uncorrected sheet figure."""
+    from energy_audit import build_audit
+    root = os.path.join(os.path.dirname(__file__), "..")
+    central = build_audit(root)["ac"]["corrected_kwh"]["central"]
+    assert opt.AC_END_USE_KWH_YR == pytest.approx(central, abs=1.0)
+    assert opt.AC_END_USE_KWH_YR < 697_296.0

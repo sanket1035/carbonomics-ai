@@ -225,7 +225,7 @@ export default function Optimization({ data }) {
   const caps = useMemo(() => ({
     total_electricity: data.kpis?.electricity_kwh ?? null,
     total_diesel: data.kpis?.diesel_litres ?? null,
-    ac_end_use: 697296,   // ESTIMATE, sheet 4_AC_Inventory
+    ac_end_use: 233054,   // ESTIMATE, corrected AC load (COP ASSUMED 3.0), see src/optimization.py
   }), [data.kpis])
 
   // Budget state (₹)
@@ -674,7 +674,7 @@ export default function Optimization({ data }) {
             <Callout title="Limitations & assumptions">
               <ul className="mt-1 list-disc pl-4 space-y-1 text-xs leading-relaxed">
                 <li>Savings modelled as static annual averages — seasonal variation ignored.</li>
-                <li>Additive electricity savings are capped at the baseline total and per end-use (AC = 697,296 kWh, the listed figure from the AC inventory). The Energy Audit page shows why this figure is probably too high and gives a corrected estimate.</li>
+                <li>Additive electricity savings are capped at the baseline total and per end-use (AC = 233,054 kWh, the corrected estimate from the AC inventory with an assumed COP of 3.0; the Energy Audit page shows the range). The AC inventory itself lists 697,296 kWh, which is probably too high because its kW is cooling capacity, not electricity drawn.</li>
                 <li>Lighting end-use is not known: there is no lighting inventory. LED measures are left out until that data exists.</li>
                 <li>Cost and saving inputs must come from the owner (vendor quote / audit); nothing is invented.</li>
                 <li>MILP assumes linear scaling per unit. Non-linearities need additional modelling.</li>

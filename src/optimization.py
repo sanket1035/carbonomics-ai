@@ -58,10 +58,14 @@ from simulation import baseline as _sim_baseline, simulate as _sim_simulate
 _EF_ELEC = EMISSION_FACTORS["electricity"]   # kg CO₂e / kWh
 _EF_DSEL = EMISSION_FACTORS["diesel"]        # kg CO₂e / L
 
-# AC end-use from sheet 4_AC_Inventory, Master Data FY2025-26 (ESTIMATE).
-# This is a subset of purchased electricity, NOT additive to the grid total.
-AC_END_USE_KWH_YR = 697_296.0
-AC_END_USE_BASIS = "ESTIMATE — sheet 4_AC_Inventory, KKWIEER Master Data FY2025-26"
+# AC end-use cap: corrected estimate from the Energy Audit (energy_audit.py), central case (COP 3.0, ASSUMED).
+# Sheet 4_AC_Inventory lists 697,296 kWh/yr, but its kW per unit is the cooling capacity, not the electrical
+# input, so that figure is probably too high (66% of purchased electricity). Dividing by an assumed COP of
+# 2.5 / 3.0 / 4.0 gives 279,665 / 233,054 / 174,791 kWh/yr. This is a subset of purchased electricity,
+# NOT additive to the grid total. tests/test_optimization.py checks it against energy_audit.build_audit().
+AC_END_USE_KWH_YR = 233_054.0
+AC_END_USE_BASIS = ("ESTIMATE (COP ASSUMED 3.0) — sheet 4_AC_Inventory corrected for cooling capacity vs electrical input, "
+                    "KKWIEER Master Data FY2025-26; Energy Audit page")
 
 # Lighting end-use: TBD — no lighting inventory in Master Data.
 LIGHTING_END_USE_KWH_YR = None
