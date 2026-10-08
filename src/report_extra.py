@@ -409,7 +409,7 @@ def draw_factor_page(c: canvas.Canvas, analysis: dict, page_no: int, change: Opt
 
 # ── Notes ─────────────────────────────────────────────────────────────────────
 def draw_notes_page(c: canvas.Canvas, analysis: dict, page_no: int, scope3: Optional[dict] = None,
-                    inventory: Optional[dict] = None) -> None:
+                    inventory: Optional[dict] = None, energy_audit: Optional[dict] = None) -> None:
     _fonts()
     _page_header(c, page_no)
     inp = analysis["input"]
@@ -431,7 +431,10 @@ def draw_notes_page(c: canvas.Canvas, analysis: dict, page_no: int, scope3: Opti
         "A forecast is a pattern-based estimate, not a promise. When the models do not beat 'same as last week', that is what is shown.",
         "Results depend on the quality of the uploaded numbers; the file is checked for gaps and bad values but not audited.",
         "Scenario figures are inputs chosen to illustrate, not predictions of what a measure will achieve.",
-    ], y, 9.5)
+    ] + ([
+        "The Energy Audit compares yearly campus electricity with proxy benchmarks (no official EPI exists for educational buildings) and "
+        "uses an assumed COP for the air-conditioning estimate. Its suggestions are things to check, not guaranteed savings.",
+    ] if energy_audit else []), y, 9.5)
     y = _h2(c, "References", y - 10)
     _bullets(c, [
         "Central Electricity Authority (CEA), CO₂ Baseline Database for the Indian Power Sector, User Guide (versions 19.0 to 22.0).",
@@ -442,4 +445,6 @@ def draw_notes_page(c: canvas.Canvas, analysis: dict, page_no: int, scope3: Opti
         "UK DEFRA greenhouse gas conversion factors (2024), diesel passenger vehicle.",
         "IPCC 2019 Refinement to the 2006 Guidelines, domestic wastewater (Tier 1).",
         "KKWIEER Carbon Footprint Master Data FY 2025-26, and the college survey carried out by the Young Indians team.",
-    ] if inventory else []), y, 9.5)
+    ] if inventory else []) + ([
+        f"{r['source']} ({r['version']})." for r in energy_audit["references"]
+    ] + ["Sources for each Energy Audit suggestion are given on the suggestion pages."] if energy_audit else []), y, 9.5)
