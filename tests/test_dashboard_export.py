@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 import dashboard_export as de
 
 
@@ -106,3 +108,9 @@ def test_payload_optimization_basis_not_ml():
     basis = payload["optimization"]["basis"]
     assert "not ML" in basis or "not ml" in basis.lower()
 
+
+
+def test_payload_energy_audit_present_and_serialisable():
+    payload = de.build_payload(".")
+    assert payload["energy_audit"]["actual"]["epi"] == pytest.approx(25.14, abs=0.01)
+    json.dumps(payload["energy_audit"])
