@@ -120,3 +120,46 @@ def test_missing_parameter_raises():
     import pandas as pd
     with pytest.raises(KeyError):
         ea._fact(pd.DataFrame({"parameter": ["x"], "value": [1]}), "built_up_area")
+
+
+def test_suggestions_have_source_scope_and_known_status(audit):
+    sug = audit["suggestions"]
+    assert [s["priority"] for s in sug] == sorted(s["priority"] for s in sug)
+    assert {s["status"] for s in sug} <= {"scenario", "what_if", "typical", "practice", "enabler"}
+    for s in sug:
+        assert s["title"].strip() and s["where"].strip() and s["why"].strip()
+        if s["status"] == "typical":
+            assert s["saving_source"].strip() and s["evidence_scope"].strip(), s["id"]
+
+
+def test_campus_number_only_where_campus_data_exists(audit):
+    with_number = {s["id"] for s in audit["suggestions"] if s["campus_number"]}
+    assert with_number == {"ac_setpoint", "ac_hours_top", "ac_hours_second"}
+
+
+def test_ac_setpoint_number_is_six_percent_of_corrected_ac(audit):
+    s = next(x for x in audit["suggestions"] if x["id"] == "ac_setpoint")
+    corrected = audit["ac"]["corrected_kwh"]["central"]
+    assert s["typical_saving_pct"] == 0.06
+    assert s["campus_number"]["kwh_central"] == pytest.approx(corrected * 0.06, abs=0.1)
+    f = EMISSION_FACTORS["electricity"]["factor"]
+    assert s["campus_number"]["tco2e_central"] == pytest.approx(corrected * 0.06 * f / 1000, abs=0.01)
+
+
+def test_ac_hours_number_is_one_hour_of_the_biggest_site(audit):
+    s = next(x for x in audit["suggestions"] if x["id"] == "ac_hours_top")
+    biggest = max(audit["ac"]["sites"], key=lambda x: x["corrected_kwh"]["central"])
+    assert s["campus_number"]["label"].startswith(biggest["location"])
+    # Guest House: 20 units x 290 days x 3.517 kW / COP 3 = 6,799.5 kWh for one hour a day
+    assert s["campus_number"]["kwh_central"] == pytest.approx(6799.5, abs=0.5)
+
+
+def test_typical_savings_are_not_turned_into_campus_kwh(audit):
+    for sid in ("occupancy_sensors", "led_retrofit", "bldc_fans", "pumps", "solar_water"):
+        assert next(x for x in audit["suggestions"] if x["id"] == sid)["campus_number"] is None
+
+
+def test_diesel_evidence_matches_real_data(audit):
+    s = next(x for x in audit["suggestions"] if x["id"] == "dg_scheduling")
+    text = s["campus_evidence"][0]
+    assert "4,100 litres" in text and "980 litres" in text and "1.6%" in text

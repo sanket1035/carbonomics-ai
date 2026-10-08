@@ -2,3 +2,4 @@ parameter,value,unit,source,master_data_sheet
 built_up_area,42125.27,m2,Admission Brochure 2024-25 (sum of facility areas),15_Campus_Infrastructure
 guest_house_built_up_area,719.59,m2,Admission Brochure 2024-25 (facility area),15_Campus_Infrastructure
 total_persons,9456,persons,Institutional ERP FY2025-26 (8633 students + 823 staff),1_Population
+hostel_built_up_area,6780.41,m2,Admission Brochure 2024-25 (Hostel & Mess facility area),15_Campus_Infrastructure

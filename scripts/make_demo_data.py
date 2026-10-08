@@ -51,6 +51,7 @@ def fake_audit_inputs(tmp):
         ("built_up_area", 20000.0, "m2", "FAKE demo figure", "demo"),
         ("guest_house_built_up_area", 600.0, "m2", "FAKE demo figure", "demo"),
         ("total_persons", 4500, "persons", "FAKE demo figure", "demo"),
+        ("hostel_built_up_area", 3000.0, "m2", "FAKE demo figure", "demo"),
     ], columns=["parameter", "value", "unit", "source", "master_data_sheet"])
     rows = []
     for name, units, ton, days, hours in [("Demo block A", 8, 1.5, 290, 9), ("Demo block B", 10, 1.5, 290, 9),
@@ -72,6 +73,7 @@ def build(tmp):
     solar.to_csv(os.path.join(tmp, "data/real/real_solar_monthly.csv"), index=False)
     open(os.path.join(tmp, "data/inputs/optimization_measures.csv"), "w").write(FAKE_MEASURES)
     fake_audit_inputs(tmp)
+    shutil.copy(os.path.join(ROOT, "data", "inputs", "energy_audit_suggestions.csv"), os.path.join(tmp, "data/inputs"))
     os.chdir(tmp)
     import make_synthetic_weekly
     from clean_data import clean_dataset
