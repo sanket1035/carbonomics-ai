@@ -1889,6 +1889,105 @@
    },
    "note": "Fake inventory. The corrected figures depend on the ASSUMED COP and on fake operating days and hours."
   },
+  "reduction": {
+   "electricity": {
+    "total_kwh": 500840.0,
+    "total_tco2e": 355.6,
+    "ac_kwh": {
+     "low": 107857.6,
+     "central": 143810.1,
+     "high": 172572.2
+    },
+    "ac_share_pct": 28.7,
+    "not_split_kwh": 357029.9,
+    "not_split_share_pct": 71.3,
+    "reference_kwh": 800000.0,
+    "reference_label": "BEE 5-star cut-off, office scheme, <50% air-conditioned",
+    "below_reference_pct": 37.4
+   },
+   "levers": [
+    {
+     "id": "ac_hours_0",
+     "label": "Demo guest house: 1 hour a day less AC",
+     "kwh": {
+      "low": 3059.8,
+      "central": 4079.7,
+      "high": 4895.7
+     },
+     "tco2e": {
+      "low": 2.17,
+      "central": 2.9,
+      "high": 3.48
+     }
+    },
+    {
+     "id": "ac_hours_1",
+     "label": "Demo block B: 1 hour a day less AC",
+     "kwh": {
+      "low": 3824.7,
+      "central": 5099.6,
+      "high": 6119.6
+     },
+     "tco2e": {
+      "low": 2.72,
+      "central": 3.62,
+      "high": 4.34
+     }
+    },
+    {
+     "id": "ac_setpoint",
+     "label": "AC setpoint 1 degC higher (on the AC energy left)",
+     "kwh": {
+      "low": 6058.4,
+      "central": 8077.8,
+      "high": 9693.4
+     },
+     "tco2e": {
+      "low": 4.3,
+      "central": 5.74,
+      "high": 6.88
+     }
+    }
+   ],
+   "combined": {
+    "kwh": {
+     "low": 12942.9,
+     "central": 17257.1,
+     "high": 20708.7
+    },
+    "tco2e": {
+     "low": 9.19,
+     "central": 12.25,
+     "high": 14.7
+    },
+    "pct_of_electricity": {
+     "low": 2.58,
+     "central": 3.45,
+     "high": 4.13
+    }
+   },
+   "diesel": {
+    "litres": 604.0,
+    "tco2e": 1.75,
+    "share_of_covered_pct": 0.5
+   },
+   "bus": null,
+   "after": {
+    "before_tco2e": 357.34,
+    "after_tco2e": {
+     "high": 348.15,
+     "central": 345.09,
+     "low": 342.64
+    },
+    "scope": "Electricity (Scope 2) and generator diesel (Scope 1), the sources with data"
+   },
+   "notes": [
+    "Essential use cannot be measured here: the part that is not split is essential use plus any waste nobody has metered.",
+    "Only air-conditioning has campus data. The AC figure uses an ASSUMED COP and the listed operating hours, which are unverified.",
+    "The three levers are not simply added: the setpoint saving is taken on the AC energy left after the hours are cut.",
+    "Lights, fans, pumps and other loads have no campus number, so none is claimed for them. Sensors, LED and BLDC fans would add to the cut."
+   ]
+  },
   "suggestions": [
    {
     "id": "ac_setpoint",
@@ -2075,8 +2174,44 @@
     "campus_number": null
    },
    {
-    "id": "dg_scheduling",
+    "id": "dg_solar_battery",
     "priority": 10,
+    "group": "Cleaner supply",
+    "title": "Solar with battery backup instead of running the diesel generator",
+    "where": "Buildings that depend on the generator during power cuts",
+    "why": "Diesel is a small share of campus emissions, so this is not the first priority. Where the generator is needed only to bridge short power cuts, solar with a battery can do that job without diesel.",
+    "status": "typical",
+    "typical_saving": "A CSE study of five housing societies found solar with battery backup costs about half as much per unit as power from a diesel generator (cost, not emissions)",
+    "typical_saving_pct": null,
+    "saving_source": "Centre for Science and Environment (CSE) policy paper, reported by Dialogue Earth",
+    "source_date": "Jan 2017",
+    "evidence_scope": "Housing societies, not a college campus; cost comparison only",
+    "needs": "Generator rating, how many hours it runs and why (power cut or test), battery and roof options",
+    "campus_evidence": [
+     "Generator diesel: 604 litres a year = 1.75 tCO2e, only 0.5% of the electricity emissions. Highest month: 2025-04 with 77 litres."
+    ],
+    "campus_number": null
+   },
+   {
+    "id": "ev_bus",
+    "priority": 11,
+    "group": "Cleaner supply",
+    "title": "Electric buses for the college bus fleet",
+    "where": "Diesel buses owned by the college",
+    "why": "Buses are the larger diesel source. Electric buses use about 70% less energy per km than diesel buses, and the emission gain depends on how clean the grid is.",
+    "status": "typical",
+    "typical_saving": "19% lower use-phase emissions than diesel with the current grid, 34% in a cleaner-grid scenario, 96% with a fully renewable grid",
+    "typical_saving_pct": null,
+    "saving_source": "ICCT, Emissions reduction and benefits of the first 3,825 electric buses under PM-eBus Sewa",
+    "source_date": "Nov 2024",
+    "evidence_scope": "City buses in India, use-phase emissions only; a college fleet with short routes may differ",
+    "needs": "Daily km and route length per bus, charging point, price quote",
+    "campus_evidence": [],
+    "campus_number": null
+   },
+   {
+    "id": "dg_scheduling",
+    "priority": 12,
     "group": "Waste candidate",
     "title": "Cut unnecessary generator running",
     "where": "The diesel generator",
@@ -2095,7 +2230,7 @@
    },
    {
     "id": "switch_off_routine",
-    "priority": 11,
+    "priority": 13,
     "group": "Waste candidate",
     "title": "Switch-off routine: lights, fans and AC off in empty rooms",
     "where": "Classrooms, labs, offices and hostels after hours",
@@ -2112,7 +2247,7 @@
    },
    {
     "id": "submetering",
-    "priority": 12,
+    "priority": 14,
     "group": "Enabler",
     "title": "Put meters on the main feeders",
     "where": "The Institute Building and the hostels",

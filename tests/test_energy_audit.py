@@ -163,3 +163,38 @@ def test_diesel_evidence_matches_real_data(audit):
     s = next(x for x in audit["suggestions"] if x["id"] == "dg_scheduling")
     text = s["campus_evidence"][0]
     assert "4,100 litres" in text and "980 litres" in text and "1.6%" in text
+
+
+def test_reduction_adds_up_and_claims_only_ac_levers(audit):
+    r = audit["reduction"]
+    e = r["electricity"]
+    assert e["ac_kwh"]["central"] + e["not_split_kwh"] == pytest.approx(e["total_kwh"], abs=0.2)
+    assert e["ac_share_pct"] + e["not_split_share_pct"] == pytest.approx(100, abs=0.1)
+    for k in ("low", "central", "high"):
+        assert r["combined"]["kwh"][k] == pytest.approx(sum(l["kwh"][k] for l in r["levers"]), abs=0.2)
+    assert r["combined"]["kwh"]["low"] < r["combined"]["kwh"]["central"] < r["combined"]["kwh"]["high"]
+    assert {l["id"] for l in r["levers"]} == {"ac_hours_0", "ac_hours_1", "ac_setpoint"}
+    # the setpoint saving is taken on the AC energy left, so it is below the stand-alone 6% figure
+    standalone = next(s for s in audit["suggestions"] if s["id"] == "ac_setpoint")["campus_number"]["kwh_central"]
+    assert next(l for l in r["levers"] if l["id"] == "ac_setpoint")["kwh"]["central"] < standalone
+
+
+def test_reduction_after_footprint_is_before_minus_the_cut(audit):
+    a = audit["reduction"]["after"]
+    c = audit["reduction"]["combined"]["tco2e"]
+    assert a["before_tco2e"] == pytest.approx(audit["actual"]["electricity_tco2e"] + audit["reduction"]["diesel"]["tco2e"], abs=0.02)
+    assert a["after_tco2e"]["central"] == pytest.approx(a["before_tco2e"] - c["central"], abs=0.02)
+    assert a["after_tco2e"]["low"] < a["after_tco2e"]["central"] < a["after_tco2e"]["high"] < a["before_tco2e"]
+
+
+def test_bus_fleet_comes_from_the_yearly_inventory_only_when_present(audit, tmp_path):
+    assert audit["reduction"]["bus"]["litres"] == 56000.0
+    assert ea._bus_fleet(str(tmp_path)) is None
+
+
+def test_diesel_alternatives_are_suggested_with_sources(audit):
+    by_id = {s["id"]: s for s in audit["suggestions"]}
+    for k in ("dg_solar_battery", "ev_bus"):
+        s = by_id[k]
+        assert s["status"] == "typical" and s["saving_source"].strip() and s["source_date"].strip() and s["campus_number"] is None
+    assert "ICCT" in by_id["ev_bus"]["saving_source"] and by_id["ev_bus"]["campus_evidence"]

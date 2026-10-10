@@ -1,5 +1,5 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Gauge, Ruler, Scale, Snowflake, Star } from 'lucide-react'
+import { Bus, Droplet, Gauge, Ruler, Scale, Snowflake, Star, TrendingDown } from 'lucide-react'
 import { Badge, Callout, Card, Kpi, fmt, useChartTheme } from '../ui.jsx'
 
 const TEAL = '#0f766e', SLATE = '#64748b', AMBER = '#d97706'
@@ -65,6 +65,65 @@ function EpiChart({ a, refs }) {
   )
 }
 
+// Where the electricity goes, what the campus data lets us cut, and the footprint after that cut.
+function Reduction({ r }) {
+  const e = r.electricity, c = r.combined, af = r.after
+  const ac = e.ac_share_pct, rest = e.not_split_share_pct
+  return (
+    <Card title="Where the electricity goes, and what can be cut" subtitle="Real numbers where campus data exists, nothing invented where it does not"
+      badge={<Badge tone="amber">uses an ASSUMED COP</Badge>}>
+      <div>
+        <div className="mb-1 flex justify-between text-xs">
+          <span className="font-medium">Electricity bought: {fmt(e.total_kwh)} kWh a year, {fmt(e.total_tco2e, 1)} tCO₂e</span>
+        </div>
+        <div className="flex h-9 overflow-hidden rounded-lg text-xs font-medium text-white">
+          <div style={{ width: `${ac}%`, background: TEAL }} className="flex items-center justify-center whitespace-nowrap px-2">AC {fmt(ac, 0)}%</div>
+          <div style={{ width: `${rest}%`, background: SLATE }} className="flex items-center justify-center whitespace-nowrap px-2">Not split: lights, fans, pumps, labs, everything else {fmt(rest, 0)}%</div>
+        </div>
+        <p className="muted mt-2 text-xs">
+          Air-conditioning is estimated at {fmt(e.ac_kwh.central)} kWh (range {fmt(e.ac_kwh.low)} to {fmt(e.ac_kwh.high)}). The other {fmt(e.not_split_kwh)} kWh has no meters, so it cannot be split into essential and waste.
+          It is essential use plus any waste nobody has measured. For comparison, the reference for a campus this size is {fmt(e.reference_kwh)} kWh, so the campus is {fmt(e.below_reference_pct, 0)}% below it.
+        </p>
+      </div>
+
+      <h4 className="mt-6 font-semibold text-slate-900 dark:text-slate-100">Waste we can point to with campus data</h4>
+      <div className="mt-2 overflow-x-auto">
+        <table className="w-full text-left text-sm">
+          <thead className="muted text-xs uppercase tracking-wide"><tr><th className="py-2 pr-4">Change</th><th className="pr-4">kWh a year</th><th>tCO₂e a year</th></tr></thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {r.levers.map((l) => (
+              <tr key={l.id}><td className="py-2 pr-4">{l.label}</td>
+                <td className="pr-4 tabular-nums">{fmt(l.kwh.central)} <span className="muted text-xs">({fmt(l.kwh.low)} to {fmt(l.kwh.high)})</span></td>
+                <td className="tabular-nums">{fmt(l.tco2e.central, 1)}</td></tr>
+            ))}
+            <tr className="font-semibold"><td className="py-2 pr-4">Together</td>
+              <td className="pr-4 tabular-nums">{fmt(c.kwh.central)} <span className="muted text-xs font-normal">({fmt(c.kwh.low)} to {fmt(c.kwh.high)})</span></td>
+              <td className="tabular-nums">{fmt(c.tco2e.central, 1)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <Kpi label="Footprint now" value={fmt(af.before_tco2e, 1)} unit="tCO₂e / yr" sub="Electricity + generator diesel" icon={Gauge} />
+        <Kpi label="After these changes" value={fmt(af.after_tco2e.central, 1)} unit="tCO₂e / yr" sub={`${fmt(af.after_tco2e.low, 1)} to ${fmt(af.after_tco2e.high, 1)} for COP 4.0 to 2.5`} icon={TrendingDown} />
+        <Kpi label="Cut" value={fmt(c.tco2e.central, 1)} unit="tCO₂e / yr" sub={`${fmt(c.pct_of_electricity.central, 1)}% of electricity; more once lights and fans are counted`} icon={TrendingDown} />
+      </div>
+
+      <h4 className="mt-6 font-semibold text-slate-900 dark:text-slate-100">Diesel, and cleaner alternatives</h4>
+      <div className="mt-2 grid gap-4 sm:grid-cols-2">
+        <Kpi label="Generator diesel" value={fmt(r.diesel.tco2e, 2)} unit="tCO₂e" sub={`${fmt(r.diesel.litres)} litres; ${fmt(r.diesel.share_of_covered_pct, 1)}% of electricity + generator. Option: solar with battery backup`} icon={Droplet} />
+        {r.bus && <Kpi label="College bus fleet diesel" value={fmt(r.bus.tco2e, 2)} unit="tCO₂e" sub={`${fmt(r.bus.litres)} litres. Option: electric buses (see suggestions)`} icon={Bus} />}
+      </div>
+      <p className="muted mt-3 text-xs">
+        Cleaner supply for the electricity that is really needed: more rooftop solar, and a solar water heater where hot water comes from electric geysers (see the suggestions below).
+      </p>
+      <ul className="muted mt-3 list-disc space-y-1 pl-5 text-xs">
+        {r.notes.map((n) => <li key={n}>{n}</li>)}
+      </ul>
+    </Card>
+  )
+}
+
 export default function EnergyAudit({ data }) {
   const ea = data.energy_audit
   if (!ea) return <Callout tone="blue" title="Energy Audit data not available">This data file has no Energy Audit block. Run the pipeline again to create it.</Callout>
@@ -91,6 +150,8 @@ export default function EnergyAudit({ data }) {
         <Kpi label="Gap to reference" value={signed(main.gap_tco2e)} unit="tCO₂e / yr" sub={below ? 'Negative: below the target' : 'Positive: above the target'} icon={Scale} />
         <Kpi label="Proxy star rating" value={`${a.proxy_star_rating} / 5`} sub="BEE office scheme, under 50% air-conditioned" icon={Star} badge={<Verified ok={false} />} />
       </div>
+
+      {ea.reduction && <Reduction r={ea.reduction} />}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card title="Campus against the references" subtitle={`${a.epi_unit}, built-up area basis`} className="lg:col-span-2">

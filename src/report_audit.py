@@ -5,6 +5,7 @@ Report pages for the Energy Audit (campus electricity against a documented bench
 
 All content comes from energy_audit.build_audit(): nothing is computed or invented here except layout. Pages:
     "Energy Audit"        : yearly electricity, EPI (kWh/m2/year) against the reference points, limits of the comparison.
+    "Where the electricity goes": AC against the part that is not split, the cut the campus data supports, footprint before and after.
     "Air-conditioning check": why the listed AC load looks too high and the corrected estimate (COP is ASSUMED and labelled so).
     "Energy Audit: suggestions" (1 to 3 pages): the ordered list with source, published saving, campus number where one exists.
 
@@ -109,6 +110,58 @@ def draw_audit_page(c: canvas.Canvas, audit: dict, page_no: int) -> None:
         y -= 12.5 * len(lines) + 3
 
 
+def draw_reduction_page(c: canvas.Canvas, audit: dict, page_no: int) -> None:
+    _fonts()
+    _page_header(c, page_no)
+    r = audit["reduction"]
+    e, comb, af = r["electricity"], r["combined"], r["after"]
+    y = _title(c, "Where the electricity goes",
+               "What share can be pointed to, what can be cut with campus data, and the footprint before and after. Nothing is invented where the campus has no data.")
+    y = _kpis(c, y, (("Electricity bought", _fmt(e["total_kwh"] / 1000, 0), "thousand kWh"),
+                     ("Footprint now", _fmt(af["before_tco2e"], 1), "tCO₂e"),
+                     ("After the changes", _fmt(af["after_tco2e"]["central"], 1), "tCO₂e"),
+                     ("Cut", _fmt(comb["tco2e"]["central"], 1), "tCO₂e")))
+    y = _h2(c, "Where the electricity goes", y)
+    w = RIGHT - LEFT
+    ac_w = w * e["ac_share_pct"] / 100
+    c.setFillColor(C_CAMPUS)
+    c.rect(LEFT, y - 26, ac_w, 26, stroke=0, fill=1)
+    c.setFillColor(HexColor("#64748b"))
+    c.rect(LEFT + ac_w, y - 26, w - ac_w, 26, stroke=0, fill=1)
+    c.setFillColor(HexColor("#ffffff"))
+    c.setFont("BodyBold", 9.5)
+    c.drawString(LEFT + 6, y - 17, f"AC {e['ac_share_pct']:.0f}%")
+    c.drawString(LEFT + ac_w + 8, y - 17, f"Not split (lights, fans, pumps, labs, everything else) {e['not_split_share_pct']:.0f}%")
+    y -= 26 + 14
+    txt = (f"Air-conditioning is estimated at {_fmt(e['ac_kwh']['central'], 0)} kWh a year (range {_fmt(e['ac_kwh']['low'], 0)} to {_fmt(e['ac_kwh']['high'], 0)}, assumed COP). "
+           f"The other {_fmt(e['not_split_kwh'], 0)} kWh has no meters, so it cannot be split into essential use and waste. "
+           f"For comparison, the reference for a campus this size is {_fmt(e['reference_kwh'], 0)} kWh, so the campus is {e['below_reference_pct']:.0f}% below it.")
+    lines = _wrap(c, txt, "Body", 9.5, w)
+    _text_block(c, lines, LEFT, y, "Body", 9.5, MUTED, 13)
+    y -= 13 * len(lines) + 10
+
+    y = _h2(c, "Waste we can point to with campus data", y)
+    rows = [(l["label"], f"{_fmt(l['kwh']['central'], 0)} ({_fmt(l['kwh']['low'], 0)} to {_fmt(l['kwh']['high'], 0)})", _fmt(l["tco2e"]["central"], 1)) for l in r["levers"]]
+    rows.append(("Together", f"{_fmt(comb['kwh']['central'], 0)} ({_fmt(comb['kwh']['low'], 0)} to {_fmt(comb['kwh']['high'], 0)})", _fmt(comb["tco2e"]["central"], 1)))
+    y = _table(c, y, ("Change", "kWh a year", "tCO₂e a year"), rows, (250, 170, RIGHT - LEFT - 420), size=9)
+    y = _howto(c, f"footprint now {_fmt(af['before_tco2e'], 1)} tCO₂e (electricity and generator diesel); after these changes about {_fmt(af['after_tco2e']['central'], 1)} "
+                  f"({_fmt(af['after_tco2e']['low'], 1)} to {_fmt(af['after_tco2e']['high'], 1)}). Lights, fans and pumps would add to the cut once they are counted.", y + 2)
+
+    y = _h2(c, "Diesel, and what could replace it", y - 4)
+    d = r["diesel"]
+    items = [f"Generator diesel: {_fmt(d['litres'], 0)} litres a year = {_fmt(d['tco2e'], 2)} tCO₂e, {d['share_of_covered_pct']:.1f}% of electricity plus generator. Option: solar with battery backup."]
+    if r.get("bus"):
+        items.append(f"College bus fleet diesel: {_fmt(r['bus']['litres'], 0)} litres a year = {_fmt(r['bus']['tco2e'], 2)} tCO₂e. Option: electric buses.")
+    items.append("Cleaner supply for the electricity that is really needed: more rooftop solar, and a solar water heater where hot water comes from electric geysers. Details and sources are on the suggestion pages.")
+    items += r["notes"]
+    for it in items:
+        lines = _wrap(c, "• " + it, "Body", 9, w)
+        if y - 12.5 * len(lines) < BOTTOM:
+            break
+        _text_block(c, lines, LEFT, y, "Body", 9, INK, 12.5)
+        y -= 12.5 * len(lines) + 3
+
+
 def draw_ac_page(c: canvas.Canvas, audit: dict, page_no: int) -> None:
     _fonts()
     _page_header(c, page_no)
@@ -184,25 +237,15 @@ def draw_suggestion_pages(c: canvas.Canvas, audit: dict, first_page: int) -> int
                "Ordered by priority. A campus number appears only where campus data exists (air-conditioning). For the rest the published saving "
                "and its source are shown, because the campus has no meters for lights, fans or pumps. These are things to check, not guaranteed savings, and no costs are included.")
     width = RIGHT - LEFT - 30
-    group = None
     for s in audit["suggestions"]:
         body = _suggestion_lines(c, s, width)
-        need = 22 + sum(r[4] for r in body) + 12 + (22 if s["group"] != group else 0)
+        need = 22 + sum(r[4] for r in body) + 12
         if y - need < BOTTOM:
             c.showPage()
             pages += 1
             _page_header(c, first_page + pages - 1)
             from report_cover import H
             y = H - 104
-        if s["group"] != group:
-            group = s["group"]
-            c.setFillColor(MUTED)
-            c.setFont("BodyBold", 9.5)
-            c.drawString(LEFT, y, group.upper())
-            c.setStrokeColor(HexColor("#cbd5e1"))
-            c.setLineWidth(0.5)
-            c.line(LEFT + c.stringWidth(group.upper(), "BodyBold", 9.5) + 8, y + 3, RIGHT, y + 3)
-            y -= 20
         c.setFillColor(TEAL)
         c.circle(LEFT + 9, y + 3, 9, stroke=0, fill=1)
         c.setFillColor(HexColor("#ffffff"))
