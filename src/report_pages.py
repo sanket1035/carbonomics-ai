@@ -448,7 +448,7 @@ def draw_optimization_page(c: canvas.Canvas, opt: dict, page_no: int = 6) -> Non
                "All measure figures (cost, saving) are the ones you typed in.")
     o, base = opt["optimal"], opt["baseline"]
     box = (("Budget", _money(opt["budget_inr"])), ("Planned spend", _money(o["total_capex_inr"])),
-           ("Cut per year", f"{_fmt(o['tco2e_saved'], 1)} tCO₂e"), ("Share of your total", f"{_fmt(o['pct_of_baseline'], 1)} %"))
+           ("Cut per year", f"{_fmt(o['tco2e_saved'], 1)}|tCO₂e"), ("Share of your total", f"{_fmt(o['pct_of_baseline'], 1)} %"))
     gap = 10
     cw = (RIGHT - LEFT - 3 * gap) / 4
     for i, (k, v) in enumerate(box):
