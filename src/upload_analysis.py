@@ -375,12 +375,32 @@ def forecast(df: pd.DataFrame, sources: List[str], future_weeks: int) -> dict:
     return out
 
 
+# ── energy audit from the building and AC rows of a master CSV ───────────────
+def _energy_audit(raw_df, mapping, df, date_col_out, grain_out, granularity, sources, building_rows, ac_rows):
+    """(audit dict or None, status). A problem with the building or AC rows never stops the carbon analysis."""
+    import upload_audit
+    if building_rows is None:
+        return None, {"status": "missing", "reason": "The file has no 'section' column, so no building area or AC list. "
+                      "Use the master CSV format (sections weekly, building, ac) to get the Energy Audit."}
+    solar = None
+    if granularity == "weekly" and "solar_kwh" in raw_df.columns:
+        s = pd.DataFrame({"d": pd.to_datetime(raw_df[mapping["date"]]), "s": pd.to_numeric(raw_df["solar_kwh"], errors="coerce")})
+        s = s.sort_values("d")
+        solar = None if s["s"].isnull().any() or (s["s"] < 0).any() else s["s"].reset_index(drop=True)
+    try:
+        audit = upload_audit.build_from_upload(df, date_col_out, grain_out, sources, building_rows, ac_rows, solar)
+    except UploadError as exc:
+        return None, {"status": "error", "reason": str(exc)}
+    return audit, {"status": "ok", "reason": None}
+
+
 # ── entry point ───────────────────────────────────────────────────────────────
 def analyze(raw: bytes, date_col=None, electricity_col=None, diesel_col=None,
             future_weeks: int = DEFAULT_FUTURE_WEEKS) -> dict:
     if not 1 <= future_weeks <= MAX_FUTURE_WEEKS:
         raise UploadError(f"future_weeks must be between 1 and {MAX_FUTURE_WEEKS}.")
-    raw_df = read_upload(raw)
+    import upload_audit      # imported here: upload_audit imports UploadError from this module
+    raw_df, building_rows, ac_rows = upload_audit.split_sections(read_upload(raw))
     mapping = map_columns(raw_df, date_col, electricity_col, diesel_col)
     sources = [t for t in (ELECTRICITY, DIESEL) if mapping[t] is not None]
     df = _clean_frame(raw_df, mapping)
@@ -415,6 +435,8 @@ def analyze(raw: bytes, date_col=None, electricity_col=None, diesel_col=None,
         "accounting": account(df, date_col_out, sources),
         "disclaimer": DISCLAIMER,
     }
+    result["energy_audit"], result["energy_audit_status"] = _energy_audit(
+        raw_df, mapping, df, date_col_out, grain_out, granularity, sources, building_rows, ac_rows)
 
     if grain_out == "monthly":
         result["forecast"] = {"status": "skipped",

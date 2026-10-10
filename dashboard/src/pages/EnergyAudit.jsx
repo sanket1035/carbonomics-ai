@@ -158,8 +158,10 @@ export default function EnergyAudit({ data }) {
           <EpiChart a={a} refs={refs} />
         </Card>
         <Card title="Per person" subtitle="Context only, not a benchmark">
-          <div className="text-3xl font-semibold tabular-nums">{fmt(a.kwh_per_person, 0)} <span className="muted text-sm font-normal">kWh / person / yr</span></div>
-          <p className="muted mt-2 text-xs">{fmt(a.persons)} people on campus. Emission factor {a.grid_factor} {a.grid_factor_unit} ({a.grid_factor_source}).</p>
+          {a.kwh_per_person == null
+            ? <p className="text-sm">Not shown: the file does not list the number of people (building item total_persons).</p>
+            : <div className="text-3xl font-semibold tabular-nums">{fmt(a.kwh_per_person, 0)} <span className="muted text-sm font-normal">kWh / person / yr</span></div>}
+          <p className="muted mt-2 text-xs">{a.persons != null && <>{fmt(a.persons)} people on campus. </>}Emission factor {a.grid_factor} {a.grid_factor_unit} ({a.grid_factor_source}).</p>
           <p className="muted mt-2 text-xs">Built-up area source: {a.area_source}.</p>
         </Card>
       </div>
@@ -249,11 +251,22 @@ export default function EnergyAudit({ data }) {
   )
 }
 
-// Uploaded files have no building area or AC inventory, so the audit cannot be computed from them.
-export function MyEnergyAudit() {
+// An uploaded master CSV (sections weekly, building, ac) carries the building area and the AC list; any other file does not.
+export function MyEnergyAudit({ a }) {
+  if (a?.energy_audit) {
+    return (
+      <div className="space-y-6">
+        <Callout tone="blue" title="Energy Audit of your file">
+          {a.energy_audit.period}. Building area and AC list are the ones in your file; the benchmarks are proxies and the AC figure uses an ASSUMED COP.
+        </Callout>
+        <EnergyAudit data={{ energy_audit: a.energy_audit }} />
+      </div>
+    )
+  }
+  const st = a?.energy_audit_status
   return (
-    <Callout tone="blue" title="Energy Audit needs building data">
-      This page compares electricity use with a benchmark per square metre and checks an air-conditioner inventory, so it needs the built-up area and the AC list. An uploaded file does not carry them yet. Open the demo to see the page.
+    <Callout tone={st?.status === 'error' ? 'amber' : 'blue'} title={st?.status === 'error' ? 'Energy Audit could not be built from your file' : 'Energy Audit needs building data'}>
+      {st?.reason ?? 'This page compares electricity use with a benchmark per square metre and checks an air-conditioner inventory, so it needs the built-up area and the AC list. Upload the master CSV (sections weekly, building and ac) to get it, or open the demo.'}
     </Callout>
   )
 }

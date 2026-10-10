@@ -51,14 +51,19 @@ COP_LABEL = ("ASSUMED coefficient of performance (cooling kW per electrical kW).
              "replace with nameplate rated input power or ISEER once collected.")
 
 
-def _fact(facts: pd.DataFrame, name: str) -> float:
+_REQUIRED = object()
+
+
+def _fact(facts: pd.DataFrame, name: str, default=_REQUIRED):
     row = facts.loc[facts["parameter"] == name]
     if row.empty:
-        raise KeyError(f"campus_facts.csv has no parameter '{name}'")
+        if default is _REQUIRED:
+            raise KeyError(f"campus_facts.csv has no parameter '{name}'")
+        return default
     return float(row["value"].iloc[0])
 
 
-def _ac_block(ac: pd.DataFrame, total_kwh: float, guest_house_area_m2: float) -> dict:
+def _ac_block(ac: pd.DataFrame, total_kwh: float, guest_house_area_m2) -> dict:
     ef = EMISSION_FACTORS["electricity"]["factor"]
     sites = []
     for _, r in ac.iterrows():
@@ -78,6 +83,8 @@ def _ac_block(ac: pd.DataFrame, total_kwh: float, guest_house_area_m2: float) ->
     modelled = sum(s["modelled_kwh"] for s in sites)
     corrected = {k: round(sum(s["corrected_kwh"][k] for s in sites), 1) for k in ASSUMED_COP}
     gh = next((s for s in sites if "guest house" in s["location"].lower()), None)
+    if guest_house_area_m2 is None:      # an uploaded file may not list the guest house area
+        gh = None
     return {
         "basis": "MODELLED (Master Data sheet 4_AC_Inventory), not metered",
         "units_total": sum(s["units"] for s in sites),
@@ -122,7 +129,8 @@ def _ac_levers(ac_block: dict, pct_per_degc: float, ef: float) -> dict:
 
 
 def build_suggestions(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.DataFrame, facts: pd.DataFrame,
-                      kwh: float, area: float) -> list:
+                      kwh: float, area: float, campus: bool = True, solar_kwh=None) -> list:
+    """campus=False is an uploaded file: the KKWIEER bus fleet and solar files are not used, solar_kwh comes from the upload."""
     ef = EMISSION_FACTORS["electricity"]["factor"]
     ef_dsl = EMISSION_FACTORS["diesel"]["factor"]
     df = load_suggestions(root)
@@ -162,13 +170,13 @@ def build_suggestions(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.D
             t = dsl * ef_dsl / 1000
             evidence.append(f"Generator diesel: {_n(dsl)} litres a year = {_n(t, 2)} tCO2e, only {_n(t / total_t_elec * 100, 1)}% of the electricity emissions. Highest month: {top['month']} with {_n(float(top['dg_diesel_litres']))} litres.")
         elif key == "bus":
-            bus = _bus_fleet(root)
+            bus = _bus_fleet(root) if campus else None
             if bus:
                 evidence.append(f"College bus fleet: {_n(bus['litres'])} litres of diesel a year = {_n(bus['tco2e'], 2)} tCO2e ({bus['basis']}). About {_n(bus['tco2e'] / (real['dg_diesel_litres'].sum() * ef_dsl / 1000), 0)} times the generator's emissions.")
         elif key == "solar":
             sp_path = os.path.join(root, "data", "real", "real_solar_monthly.csv")
-            if os.path.exists(sp_path):
-                sk = float(pd.read_csv(sp_path)["solar_kwh"].sum())
+            sk = solar_kwh if not campus else (float(pd.read_csv(sp_path)["solar_kwh"].sum()) if os.path.exists(sp_path) else None)
+            if sk is not None:
                 evidence.append(f"Existing rooftop solar generated {_n(sk)} kWh in the last 12 months, {_n(sk / kwh * 100, 1)}% of purchased electricity. It is reported separately and not subtracted from the purchased total.")
         elif key == "submeter":
             evidence.append(f"Only the AC load can be estimated, about {_n(ac_c['central'] / kwh * 100)}% of purchased electricity. The other {_n(100 - ac_c['central'] / kwh * 100)}% has no end-use split.")
@@ -196,7 +204,7 @@ def _bus_fleet(root: str):
 
 
 def build_reduction(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.DataFrame, kwh: float, area: float,
-                    references: list) -> dict:
+                    references: list, campus: bool = True) -> dict:
     """Where the electricity goes, what can be cut with campus data, and the footprint after that cut.
 
     Only the AC levers have campus data (corrected AC estimate with an ASSUMED COP, listed daily hours, and the
@@ -243,7 +251,7 @@ def build_reduction(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.Dat
         "combined": {"kwh": comb_kwh, "tco2e": comb_t,
                      "pct_of_electricity": {k: round(v / kwh * 100, 2) for k, v in comb_kwh.items()}},
         "diesel": {"litres": round(dsl_l, 1), "tco2e": round(dsl_t, 2), "share_of_covered_pct": round(dsl_t / before * 100, 1)},
-        "bus": _bus_fleet(root),
+        "bus": _bus_fleet(root) if campus else None,
         "after": {"before_tco2e": round(before, 2),
                   "after_tco2e": {"high": round(before - comb_t["low"], 2), "central": round(before - comb_t["central"], 2),
                                   "low": round(before - comb_t["high"], 2)},
@@ -257,20 +265,34 @@ def build_reduction(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.Dat
     }
 
 
-def build_audit(root: str = ".", zone: str = DEFAULT_ZONE) -> dict:
+def build_audit(root: str = ".", zone: str = DEFAULT_ZONE, upload: dict | None = None) -> dict:
+    """Audit of the campus files (default) or of an uploaded file.
+
+    upload = {"real": monthly frame (month, electricity_kwh, dg_diesel_litres) for 12 months, "facts": campus_facts-style
+    frame, "ac": ac_inventory-style frame, "solar_kwh": float or None, "period": str, "basis": str, "area_source": str}.
+    With upload, nothing of the KKWIEER campus (bus fleet, solar file, brochure source) is mixed in.
+    """
     p = lambda *a: os.path.join(root, *a)  # noqa: E731
-    real = pd.read_csv(p("data", "real", "real_monthly_2025.csv"))
-    facts = pd.read_csv(p("data", "real", "campus_facts.csv"))
-    ac = pd.read_csv(p("data", "real", "ac_inventory.csv"))
+    campus = upload is None
+    if campus:
+        real = pd.read_csv(p("data", "real", "real_monthly_2025.csv"))
+        facts = pd.read_csv(p("data", "real", "campus_facts.csv"))
+        ac = pd.read_csv(p("data", "real", "ac_inventory.csv"))
+    else:
+        real, facts, ac = upload["real"], upload["facts"], upload["ac"]
 
     ef = EMISSION_FACTORS["electricity"]
     kwh = float(real["electricity_kwh"].sum())
     area = _fact(facts, "built_up_area")
-    persons = _fact(facts, "total_persons")
+    persons = _fact(facts, "total_persons", None)
     actual_t = kwh * ef["factor"] / 1000
     epi = kwh / area
 
-    ac_block = _ac_block(ac, kwh, _fact(facts, "guest_house_built_up_area"))
+    ac_block = _ac_block(ac, kwh, _fact(facts, "guest_house_built_up_area", None))
+    if not campus:
+        ac_block["basis"] = "MODELLED from the AC list in your file (units x days x hours x listed kW), not metered"
+        ac_block["note"] = ("The corrected figures depend on the ASSUMED COP and on the operating days and hours "
+                            "in your file, which are unverified.")
     references = []
     for b in benchmark_list(zone):
         target_kwh = b["value"] * area
@@ -287,8 +309,10 @@ def build_audit(root: str = ".", zone: str = DEFAULT_ZONE) -> dict:
         })
 
     return {
-        "period": "Calendar year 2025",
-        "basis": "REAL monthly electricity (Energy team log) / built-up area; formula only, no ML",
+        "period": "Calendar year 2025" if campus else upload["period"],
+        "basis": ("REAL monthly electricity (Energy team log) / built-up area; formula only, no ML" if campus
+                  else upload["basis"]),
+        "from_upload": not campus,
         "zone": zone,
         "zone_note": ZONE_NOTE,
         "actual": {
@@ -297,20 +321,23 @@ def build_audit(root: str = ".", zone: str = DEFAULT_ZONE) -> dict:
             "grid_factor": ef["factor"], "grid_factor_unit": ef["output"],
             "grid_factor_source": f"{ef['source']}, {ef['version']}",
             "built_up_area_m2": area,
-            "area_source": "Admission Brochure 2024-25 (Master Data sheet 15_Campus_Infrastructure)",
+            "area_source": ("Admission Brochure 2024-25 (Master Data sheet 15_Campus_Infrastructure)" if campus
+                            else upload["area_source"]),
             "epi": round(epi, 2), "epi_unit": BENCHMARK_UNIT,
-            "persons": int(persons),
-            "kwh_per_person": round(kwh / persons, 1),
+            "persons": None if persons is None else int(persons),
+            "kwh_per_person": None if not persons else round(kwh / persons, 1),
             "proxy_star_rating": star_rating(epi, zone),
         },
         "references": references,
         "ac": ac_block,
-        "reduction": build_reduction(root, ac_block, ac, real, kwh, area, references),
-        "suggestions": build_suggestions(root, ac_block, ac, real, facts, kwh, area),
+        "reduction": build_reduction(root, ac_block, ac, real, kwh, area, references, campus),
+        "suggestions": build_suggestions(root, ac_block, ac, real, facts, kwh, area, campus,
+                                         None if campus else upload.get("solar_kwh")),
         "caveats": [
             "No official BEE/ECBC EPI exists for educational buildings: every benchmark here is a proxy.",
             "The climate-zone mapping of the BEE bands is inferred from extracted PDF text, not checked against the original.",
-            "Built-up area is the brochure figure; a larger real area would lower the EPI further.",
+            ("Built-up area is the brochure figure; a larger real area would lower the EPI further." if campus
+             else "Built-up area is the figure in your file; a larger real area would lower the EPI further."),
             "No end-use metering exists (AC, lights, fans, pumps), so no waste is claimed from this calculation.",
             "A negative gap means the campus is already below the reference, not that no saving is possible.",
         ],
