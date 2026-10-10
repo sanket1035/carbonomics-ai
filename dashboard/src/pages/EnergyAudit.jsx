@@ -253,17 +253,18 @@ export default function EnergyAudit({ data }) {
 
 // An uploaded master CSV (sections weekly, building, ac) carries the building area and the AC list; any other file does not.
 export function MyEnergyAudit({ a }) {
-  if (a?.energy_audit) {
+  const r = a?.result
+  if (r?.energy_audit) {
     return (
       <div className="space-y-6">
         <Callout tone="blue" title="Energy Audit of your file">
-          {a.energy_audit.period}. Building area and AC list are the ones in your file; the benchmarks are proxies and the AC figure uses an ASSUMED COP.
+          {r.energy_audit.period}. Building area and AC list are the ones in your file; the benchmarks are proxies and the AC figure uses an ASSUMED COP.
         </Callout>
-        <EnergyAudit data={{ energy_audit: a.energy_audit }} />
+        <EnergyAudit data={{ energy_audit: r.energy_audit }} />
       </div>
     )
   }
-  const st = a?.energy_audit_status
+  const st = r?.energy_audit_status
   return (
     <Callout tone={st?.status === 'error' ? 'amber' : 'blue'} title={st?.status === 'error' ? 'Energy Audit could not be built from your file' : 'Energy Audit needs building data'}>
       {st?.reason ?? 'This page compares electricity use with a benchmark per square metre and checks an air-conditioner inventory, so it needs the built-up area and the AC list. Upload the master CSV (sections weekly, building and ac) to get it, or open the demo.'}
