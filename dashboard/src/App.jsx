@@ -100,6 +100,11 @@ export default function App() {
 
 function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const [open, setOpen] = useState(false)
+  // Desktop sidebar can be closed with the cross and reopened from the header; the choice is remembered in this browser.
+  const [collapsed, setCollapsed] = useState(() => { try { return localStorage.getItem('sidebar-collapsed') === '1' } catch { return false } })
+  useEffect(() => { try { localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0') } catch { /* private window: the sidebar still works */ } }, [collapsed])
+  const openMenu = () => { if (window.matchMedia('(min-width: 1024px)').matches) setCollapsed((c) => !c); else setOpen(true) }
+  const closeMenu = () => { setOpen(false); setCollapsed(true) }
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [analysis, setAnalysis] = useState(readSaved)   // { result, fileName } of the file the user analysed or opened from History
@@ -158,8 +163,8 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
 
   return (
     <ThemeCtx.Provider value={{ dark }}>
-      <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr]">
-        <aside className={`${open ? 'fixed inset-0 z-40 block bg-white p-5 dark:bg-slate-950' : 'hidden'} lg:static lg:block lg:border-r lg:border-slate-200 lg:bg-white lg:p-5 dark:lg:border-slate-800 dark:lg:bg-slate-950`}>
+      <div className={`min-h-screen ${collapsed ? '' : 'lg:grid lg:grid-cols-[250px_1fr]'}`}>
+        <aside className={`${open ? 'fixed inset-0 z-40 block overflow-y-auto bg-white p-5 dark:bg-slate-950' : 'hidden'} ${collapsed ? 'lg:hidden' : 'lg:block'} lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-r lg:border-slate-200 lg:bg-white lg:p-5 dark:lg:border-slate-800 dark:lg:bg-slate-950`}>
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img src="./favicon.svg" alt="" className="h-9 w-9" />
@@ -168,7 +173,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
                 <div className="muted text-xs">Carbon intelligence</div>
               </div>
             </div>
-            <button className="lg:hidden" onClick={() => setOpen(false)} aria-label="Close menu"><X size={22} /></button>
+            <button className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={closeMenu} aria-label="Close menu" title="Close menu"><X size={22} /></button>
           </div>
           {nav}
           <a href="#home" className="muted mt-4 flex items-center gap-3 px-3 py-2 text-sm hover:underline"><Home size={16} /> Home</a>
@@ -179,7 +184,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
         <div className="min-w-0">
           <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur sm:px-8 dark:border-slate-800 dark:bg-slate-950/80">
             <div className="flex items-center gap-3">
-              <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><Menu size={22} /></button>
+              <button className={`rounded-lg p-1 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${collapsed ? '' : 'lg:hidden'}`} onClick={openMenu} aria-label="Open menu" title="Open menu"><Menu size={22} /></button>
               <h1 className="text-lg font-semibold text-slate-900 dark:text-white">{current.label}</h1>
             </div>
             <div className="flex items-center gap-3">
