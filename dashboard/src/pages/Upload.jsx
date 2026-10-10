@@ -38,6 +38,7 @@ export default function Upload({ analysis, onResult }) {
     <div className="space-y-6">
       <Callout tone="blue" title="Analyse your own data (CSV or Excel)">
         Upload daily, weekly or monthly rows with a date column and electricity (kWh) and/or generator diesel (litres). An Excel workbook may keep them on separate sheets: sheets with a date column and a kWh or diesel (L) column are read and joined by date, the other sheets are ignored.
+        For the Energy Audit use one master CSV with a <b>section</b> column: <b>weekly</b> rows (week_start, electricity_kwh, diesel_litres), <b>building</b> rows (built_up_area in m2) and <b>ac</b> rows (name, units, capacity_ton, listed_kw_per_unit, daily_hours, days_per_year).
         Emission is always activity x emission factor. The forecast predicts activity only, and a model is used only if it
         beats the naive last-week guess. Your file itself is processed in memory and is not stored; the results (totals and
         per-period figures) are saved to your private history so you can open them later.
