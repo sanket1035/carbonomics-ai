@@ -592,9 +592,11 @@ def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = 
         import report_audit as rau
         rau.draw_audit_page(c, energy_audit, n)
         c.showPage()
-        rau.draw_ac_page(c, energy_audit, n + 1)
+        rau.draw_reduction_page(c, energy_audit, n + 1)
         c.showPage()
-        n += 2 + rau.draw_suggestion_pages(c, energy_audit, n + 2)
+        rau.draw_ac_page(c, energy_audit, n + 2)
+        c.showPage()
+        n += 3 + rau.draw_suggestion_pages(c, energy_audit, n + 3)
         c.showPage()
     rx.draw_trend_page(c, analysis, n)
     c.showPage()

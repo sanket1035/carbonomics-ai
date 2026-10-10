@@ -161,6 +161,10 @@ def build_suggestions(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.D
             top = real.loc[real["dg_diesel_litres"].idxmax()]
             t = dsl * ef_dsl / 1000
             evidence.append(f"Generator diesel: {_n(dsl)} litres a year = {_n(t, 2)} tCO2e, only {_n(t / total_t_elec * 100, 1)}% of the electricity emissions. Highest month: {top['month']} with {_n(float(top['dg_diesel_litres']))} litres.")
+        elif key == "bus":
+            bus = _bus_fleet(root)
+            if bus:
+                evidence.append(f"College bus fleet: {_n(bus['litres'])} litres of diesel a year = {_n(bus['tco2e'], 2)} tCO2e ({bus['basis']}). About {_n(bus['tco2e'] / (real['dg_diesel_litres'].sum() * ef_dsl / 1000), 0)} times the generator's emissions.")
         elif key == "solar":
             sp_path = os.path.join(root, "data", "real", "real_solar_monthly.csv")
             if os.path.exists(sp_path):
@@ -176,6 +180,81 @@ def build_suggestions(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.D
             "needs": r["needs"], "campus_evidence": evidence, "campus_number": numbers,
         })
     return out
+
+
+def _bus_fleet(root: str):
+    """College bus fleet diesel from the yearly inventory, or None when that file is not present (the public demo)."""
+    path = os.path.join(root, "data", "real", "annual_inventory_fy2025_26.csv")
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path)
+    row = df.loc[df["source"] == "College bus fleet"]
+    if row.empty:
+        return None
+    r = row.iloc[0]
+    return {"litres": float(r["activity_value"]), "tco2e": float(r["tco2e"]), "basis": str(r["basis"])}
+
+
+def build_reduction(root: str, ac_block: dict, ac_df: pd.DataFrame, real: pd.DataFrame, kwh: float, area: float,
+                    references: list) -> dict:
+    """Where the electricity goes, what can be cut with campus data, and the footprint after that cut.
+
+    Only the AC levers have campus data (corrected AC estimate with an ASSUMED COP, listed daily hours, and the
+    published 6% per degC setpoint figure from the suggestions file). Everything else is reported as "not split".
+    The three levers are taken in order: hours at the two biggest AC sites, then the setpoint on the AC energy left.
+    Keys low/central/high are kWh magnitudes (low = COP 4.0, high = COP 2.5).
+    """
+    ef = EMISSION_FACTORS["electricity"]["factor"]
+    ef_dsl = EMISSION_FACTORS["diesel"]["factor"]
+    sug = load_suggestions(root)
+    pct = float(sug.loc[sug["id"] == "ac_setpoint", "typical_saving_pct"].iloc[0] or 0)
+    hours = {r["location"]: float(r["daily_hours"]) or 1.0 for _, r in ac_df.iterrows()}
+    sites = sorted(ac_block["sites"], key=lambda s: -s["corrected_kwh"]["central"])[:2]
+    cop_key = {"low": "high", "central": "central", "high": "low"}      # kWh label -> key in corrected_kwh
+    lever_hours = [{"id": f"ac_hours_{i}", "label": f"{s['location']}: 1 hour a day less AC",
+                    "kwh": {k: round(s["corrected_kwh"][ck] / hours.get(s["location"], 1.0), 1) for k, ck in cop_key.items()}}
+                   for i, s in enumerate(sites)]
+    after_hours = {k: ac_block["corrected_kwh"][ck] - sum(l["kwh"][k] for l in lever_hours) for k, ck in cop_key.items()}
+    lever_set = {"id": "ac_setpoint", "label": "AC setpoint 1 degC higher (on the AC energy left)",
+                 "kwh": {k: round(v * pct, 1) for k, v in after_hours.items()}}
+    levers = lever_hours + [lever_set]
+    for l in levers:
+        l["tco2e"] = {k: round(v * ef / 1000, 2) for k, v in l["kwh"].items()}
+    comb_kwh = {k: round(sum(l["kwh"][k] for l in levers), 1) for k in cop_key}
+    comb_t = {k: round(v * ef / 1000, 2) for k, v in comb_kwh.items()}
+
+    ac_c = ac_block["corrected_kwh"]
+    ref = next((r for r in references if r["role"] == "reference"), references[0])
+    dsl_l = float(real["dg_diesel_litres"].sum())
+    dsl_t = dsl_l * ef_dsl / 1000
+    elec_t = kwh * ef / 1000
+    before = elec_t + dsl_t
+    return {
+        "electricity": {
+            "total_kwh": round(kwh, 1), "total_tco2e": round(elec_t, 2),
+            "ac_kwh": {k: round(ac_c[ck], 1) for k, ck in cop_key.items()},
+            "ac_share_pct": round(ac_c["central"] / kwh * 100, 1),
+            "not_split_kwh": round(kwh - ac_c["central"], 1),
+            "not_split_share_pct": round((1 - ac_c["central"] / kwh) * 100, 1),
+            "reference_kwh": ref["target_kwh"], "reference_label": ref["label"],
+            "below_reference_pct": round((ref["target_kwh"] - kwh) / ref["target_kwh"] * 100, 1),
+        },
+        "levers": levers,
+        "combined": {"kwh": comb_kwh, "tco2e": comb_t,
+                     "pct_of_electricity": {k: round(v / kwh * 100, 2) for k, v in comb_kwh.items()}},
+        "diesel": {"litres": round(dsl_l, 1), "tco2e": round(dsl_t, 2), "share_of_covered_pct": round(dsl_t / before * 100, 1)},
+        "bus": _bus_fleet(root),
+        "after": {"before_tco2e": round(before, 2),
+                  "after_tco2e": {"high": round(before - comb_t["low"], 2), "central": round(before - comb_t["central"], 2),
+                                  "low": round(before - comb_t["high"], 2)},
+                  "scope": "Electricity (Scope 2) and generator diesel (Scope 1), the sources with data"},
+        "notes": [
+            "Essential use cannot be measured here: the part that is not split is essential use plus any waste nobody has metered.",
+            "Only air-conditioning has campus data. The AC figure uses an ASSUMED COP and the listed operating hours, which are unverified.",
+            "The three levers are not simply added: the setpoint saving is taken on the AC energy left after the hours are cut.",
+            "Lights, fans, pumps and other loads have no campus number, so none is claimed for them. Sensors, LED and BLDC fans would add to the cut.",
+        ],
+    }
 
 
 def build_audit(root: str = ".", zone: str = DEFAULT_ZONE) -> dict:
@@ -226,6 +305,7 @@ def build_audit(root: str = ".", zone: str = DEFAULT_ZONE) -> dict:
         },
         "references": references,
         "ac": ac_block,
+        "reduction": build_reduction(root, ac_block, ac, real, kwh, area, references),
         "suggestions": build_suggestions(root, ac_block, ac, real, facts, kwh, area),
         "caveats": [
             "No official BEE/ECBC EPI exists for educational buildings: every benchmark here is a proxy.",
