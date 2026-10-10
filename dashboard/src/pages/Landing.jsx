@@ -273,7 +273,36 @@ export default function Landing() {
             </Reveal>
           ))}
         </div>
-        <p className="mt-6 text-sm text-white/40">Project guide: Dr. Sneha A. Khaire, Professor, Department of AI &amp; DS, KKWIEER, Nashik.</p>
+        <Reveal>
+          <div className="mt-10 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+            <div className="relative overflow-hidden rounded-2xl border border-teal-400/40 bg-gradient-to-br from-teal-400/[.10] via-white/[.03] to-transparent p-6 shadow-[0_0_40px_-12px_rgba(45,212,191,.45)] sm:p-8">
+              <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-teal-400/20 blur-3xl" aria-hidden="true" />
+              <div className="relative">
+                <h3 className="font-display text-3xl text-white sm:text-4xl">Special Thanks</h3>
+                <div className="mt-3 h-1 w-12 rounded-full bg-teal-300" aria-hidden="true" />
+                <p className="mt-6 text-2xl font-bold text-white sm:text-3xl">Dr. Sneha Arjun Khaire</p>
+                <p className="mt-1 text-lg font-medium text-teal-300">Assistant Professor</p>
+                <p className="mt-2 text-base leading-relaxed text-white/70">Department of AI &amp; DS, K. K. Wagh Institute of Engineering Education and Research (KKWIEER), Nashik</p>
+                <div className="my-5 h-px bg-white/10" aria-hidden="true" />
+                <p className="text-base leading-relaxed text-white/60">Our project guide, for her continuous support, valuable suggestions and guidance throughout the project.</p>
+              </div>
+            </div>
+            <div className="relative overflow-hidden rounded-2xl border border-teal-400/40 bg-gradient-to-br from-teal-400/[.10] via-white/[.03] to-transparent p-6 shadow-[0_0_40px_-12px_rgba(45,212,191,.45)] sm:p-8">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-teal-400/20 blur-3xl" aria-hidden="true" />
+              <div className="relative">
+                <h3 className="font-display text-3xl text-white sm:text-4xl">Project Support</h3>
+                <div className="mt-3 h-1 w-12 rounded-full bg-teal-300" aria-hidden="true" />
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-teal-300">Principal</p>
+                <p className="mt-1 text-xl font-bold text-white sm:text-2xl">Dr. Keshav N. Nandurkar</p>
+                <p className="mt-1 text-base leading-relaxed text-white/70">K. K. Wagh Institute of Engineering Education &amp; Research, Nashik</p>
+                <div className="my-5 h-px bg-white/10" aria-hidden="true" />
+                <p className="text-xs font-semibold uppercase tracking-[.2em] text-teal-300">Head of Department</p>
+                <p className="mt-1 text-xl font-bold text-white sm:text-2xl">Dr. Darshan V. Medhane</p>
+                <p className="mt-1 text-base leading-relaxed text-white/70">Department of AI &amp; DS, KKWIEER, Nashik</p>
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       <section className="relative isolate overflow-hidden py-24 text-center text-white">
