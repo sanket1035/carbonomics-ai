@@ -153,32 +153,19 @@ function Feature({ icon: Icon, kind, kicker, title, text, flip }) {
 }
 
 
-// Big "carbonomics" wordmark for the page bottom: the letters are a window onto misty pine forest (drawn in SVG, no photo).
-const TREES = Array.from({ length: 58 }, (_, i) => {
-  const x = -10 + i * 21 + ((i * 53) % 13)                 // fixed pseudo-random spread, so the picture never changes
-  const h = 110 + ((i * 37) % 80) + (i > 26 ? 50 : 0)       // denser, taller forest on the right
-  return { x, h, w: 30 + ((i * 17) % 14), dark: i > 24 }
-})
+// Big "carbonomics" wordmark for the page bottom: the letters are a window onto a misty pine forest.
+// The picture is drawn by scripts/make_wordmark_forest.py (procedural, no stock photo).
 function Wordmark() {
   return (
     <svg viewBox="0 0 1200 232" className="mx-auto block w-full max-w-6xl select-none" role="img" aria-label="Carbonomics">
       <defs>
-        <linearGradient id="wm-mist" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e3f0ed" /><stop offset=".55" stopColor="#bfdcd4" /><stop offset="1" stopColor="#8fc6b7" />
-        </linearGradient>
-        <linearGradient id="wm-fade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#e3f0ed" stopOpacity=".92" /><stop offset=".45" stopColor="#e3f0ed" stopOpacity=".55" /><stop offset="1" stopColor="#e3f0ed" stopOpacity="0" />
-        </linearGradient>
         <clipPath id="wm-clip">
           <text x="600" y="212" textAnchor="middle" fontFamily="Newsreader, Georgia, serif" fontWeight="500" fontSize="250" letterSpacing="-6" textLength="1180" lengthAdjust="spacingAndGlyphs">carbonomics</text>
         </clipPath>
       </defs>
       <g clipPath="url(#wm-clip)">
-        <rect width="1200" height="232" fill="url(#wm-mist)" />
-        {TREES.map((t, i) => (
-          <polygon key={i} points={`${t.x},232 ${t.x + t.w},232 ${t.x + t.w / 2},${232 - t.h}`} fill={t.dark ? '#1f4a43' : '#4c8a7f'} opacity={t.dark ? 0.95 : 0.7} />
-        ))}
-        <rect width="1200" height="232" fill="url(#wm-fade)" />
+        <rect width="1200" height="232" fill="#a6d2c8" />
+        <image href="./wordmark-forest.webp" width="1200" height="232" preserveAspectRatio="xMidYMid slice" />
       </g>
     </svg>
   )
