@@ -5,7 +5,7 @@ import { Badge, COLORS, Callout, Card, Kpi, fmt, useChartTheme } from '../ui.jsx
 import { api } from '../api.js'
 
 const YourInputs = () => <Badge tone="blue">YOUR INPUTS</Badge>
-const field = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-white/10 dark:bg-black/30'
+const field = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-black/30'
 
 // 3300000 -> "₹33.00 lakh"; shown next to the budget box so a missing zero is easy to spot.
 export function inr(n) {
@@ -91,7 +91,7 @@ export default function OptimizeCard({ r, onPlan }) {
   const add = (t) => setRows((rs) => (rs.length >= 30 ? rs : [...rs, t.make()]))
   const stepHead = (n, title, text, done) => (
     <div className="mb-3 flex items-start gap-3">
-      <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${done ? 'bg-emerald-500 text-white' : 'bg-teal-600/15 text-teal-700 dark:text-teal-300'}`}>{done ? <Check size={14} /> : n}</span>
+      <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${done ? 'bg-brand-500 text-white' : 'bg-brand-500/15 text-brand-700 dark:text-brand-400'}`}>{done ? <Check size={14} /> : n}</span>
       <div><div className="font-medium text-slate-900 dark:text-white">{title}</div><div className="muted text-xs">{text}</div></div>
     </div>
   )
@@ -116,8 +116,8 @@ export default function OptimizeCard({ r, onPlan }) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {TEMPLATES.filter((t) => t.key === 'other' || (t.needs === 'electricity' ? hasElec : hasDiesel)).map((t) => (
             <button key={t.key} onClick={() => add(t)} disabled={rows.length >= 30}
-              className="group flex flex-col items-start gap-1 rounded-2xl border border-slate-200 p-3 text-left transition hover:-translate-y-0.5 hover:border-teal-500/60 hover:bg-teal-500/5 dark:border-white/10">
-              <t.icon size={20} className="text-teal-600 transition group-hover:scale-110 dark:text-teal-300" />
+              className="group flex flex-col items-start gap-1 rounded-2xl border border-slate-200 p-3 text-left transition hover:-translate-y-0.5 hover:border-brand-500/60 hover:bg-brand-500/5 dark:border-white/10">
+              <t.icon size={20} className="text-brand-600 transition group-hover:scale-110 dark:text-brand-400" />
               <span className="text-sm font-medium text-slate-900 dark:text-white">{t.title}</span>
               <span className="muted text-xs">{t.hint}</span>
             </button>
@@ -188,7 +188,7 @@ export default function OptimizeCard({ r, onPlan }) {
               className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-50">
               {saveState === 'saving' && <Loader2 size={16} className="animate-spin" />} Save this plan
             </button>
-            {saveState && saveState !== 'saving' && <span className={`text-xs ${saveState.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>{saveState.message}</span>}
+            {saveState && saveState !== 'saving' && <span className={`text-xs ${saveState.ok ? 'text-brand-600 dark:text-emerald-400' : 'text-rose-500'}`}>{saveState.message}</span>}
           </div>
         </Card>
       )}
@@ -206,7 +206,7 @@ export function PlanView({ r }) {
   const names = o.selected.map((x) => `${x.label}${x.units > 1 ? ` x${x.units}` : ''}`).join(', ')
   return (
     <div className="space-y-5">
-      <p className="rounded-2xl border border-teal-500/30 bg-teal-500/5 p-4 text-sm leading-relaxed text-slate-800 dark:text-slate-100">
+      <p className="rounded-2xl border border-brand-500/30 bg-brand-500/5 p-4 text-sm leading-relaxed text-slate-800 dark:text-slate-100">
         {o.selected.length === 0
           ? `Nothing fits a budget of ${inr(r.budget_inr)} yet.`
           : `Spend ${inr(o.total_capex_inr)} of your ${inr(r.budget_inr)} on ${names}. This saves about ${fmt(o.tco2e_saved, 1)} tCO₂e a year, ${fmt(o.pct_of_baseline, 1)}% of your current ${fmt(baseline.tco2e_per_year, 1)}.`}

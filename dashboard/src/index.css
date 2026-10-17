@@ -71,10 +71,106 @@ h1, h2 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01
 @keyframes shimmer-move { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 .rise { animation: rise .55s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: var(--d, 0ms); }
 .page-in { animation: rise .45s cubic-bezier(.2, .8, .2, 1) backwards; }
-.shimmer { background: linear-gradient(90deg, #0f766e 0%, #5eead4 45%, #0f766e 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
+.shimmer { background: linear-gradient(90deg, #6ea89e 0%, #cfe5d5 45%, #6ea89e 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
 button:not(:disabled), a.btn { transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease; }
 button:not(:disabled):active { transform: scale(.97); }
 .card { transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease; }
 @media (prefers-reduced-motion: reduce) {
   .rise, .page-in, .shimmer { animation: none; opacity: 1; transform: none; }
 }
+
+/* ===== Dashboard shell (top navigation, paper surface, framed column) =====
+   Everything below is scoped to .app-shell / .app-head so the landing, login and legal pages are untouched. */
+@theme { --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+.app-shell {
+  /* warm paper in light mode; the slate-900/800 greys get a faint green cast in dark mode */
+  --color-white: #fffdf8;
+  --color-slate-50: #f9f5ea;
+  --color-slate-100: #f1ecdc;
+  --color-slate-200: #e6dfcb;
+  --color-slate-900: #111311;
+  --color-slate-800: #1b1e1b;
+  --color-slate-950: #0a0b0a;
+  --color-brand-50: #e3f0ed;
+  --color-brand-400: #a6d2c8;
+  --color-brand-500: #6ea89e;
+  --color-brand-600: #4c8a7f;
+  --color-brand-700: #36695f;
+  --hair: #e3dcc7;
+  --chart-green: #6ea89e;   /* Teal Mist: the green of every chart mark in light mode */
+  background-color: var(--color-slate-50);
+  background-image: repeating-linear-gradient(135deg, rgba(60, 50, 20, .06) 0 1px, transparent 1px 9px);
+}
+.dark .app-shell { --chart-green: #a6d2c8; --color-brand-500: #a6d2c8; --color-brand-600: #5f9a8f; --hair: rgba(255, 255, 255, .09); background-color: var(--color-slate-950); background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 9px); }
+.app-frame { background-color: var(--color-slate-50); border-inline: 1px solid var(--hair); }
+.dark .app-frame { background-color: var(--color-slate-950); }
+
+@layer components {
+.kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--color-brand-700); }
+.dark .app-shell .kicker { color: var(--color-brand-400); }
+}
+.app-shell h1, .app-shell h2 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.02em; }
+
+/* header */
+.app-head { background: color-mix(in srgb, var(--color-slate-50) 88%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid var(--hair); }
+.dark .app-head { background: color-mix(in srgb, var(--color-slate-950) 86%, transparent); }
+@layer components {
+.nav-item { color: var(--color-slate-600); }
+.dark .nav-item { color: var(--color-slate-300); }
+.nav-item:hover { color: var(--color-slate-900); background: rgba(60, 50, 20, .07); }
+.dark .nav-item:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+.nav-item-here { color: var(--color-slate-900); box-shadow: inset 0 -2px 0 var(--color-brand-600); border-radius: 0; }
+.dark .nav-item-here { color: #fff; box-shadow: inset 0 -2px 0 var(--color-brand-400); }
+.nav-item-open, .nav-item-open:hover { background: #151715; color: #fff; box-shadow: none; border-radius: 12px; }
+.dark .nav-item-open, .dark .nav-item-open:hover { background: #fff; color: #0a0b0a; }
+
+}
+.nav-pop { background: #151715; border: 1px solid rgba(255, 255, 255, .08); border-radius: 24px; padding: 1.25rem; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .55); animation: rise .22s cubic-bezier(.2, .8, .2, 1) both; }
+.dark .nav-pop { background: #131513; border-color: rgba(255, 255, 255, .12); }
+.nav-pop-arrow { position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; background: #151715; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.dark .nav-pop-arrow { background: #131513; }
+.grain { position: relative; overflow: hidden; }
+.grain::after { content: ""; position: absolute; inset: 0; opacity: .35; mix-blend-mode: multiply; background-image: radial-gradient(rgba(0, 0, 0, .35) 1px, transparent 1.2px); background-size: 4px 4px; }
+
+@layer components {
+.btn-primary { display: inline-flex; align-items: center; gap: .4rem; border-radius: 10px; background: var(--color-brand-500); padding: .55rem .9rem; font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: #04130c; }
+.btn-primary:hover { background: var(--color-brand-400); }
+.btn-ghost { display: inline-flex; align-items: center; gap: .4rem; border-radius: 10px; border: 1px solid var(--hair); background: var(--color-white); padding: .5rem .8rem; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--color-slate-700); }
+.dark .btn-ghost { background: rgba(255, 255, 255, .03); color: var(--color-slate-200); }
+.btn-ghost:hover { border-color: var(--color-brand-500); }
+.icon-btn { display: inline-grid; place-items: center; height: 2.25rem; width: 2.25rem; border-radius: 10px; border: 1px solid var(--hair); background: var(--color-white); color: var(--color-slate-700); }
+.dark .icon-btn { background: rgba(255, 255, 255, .03); color: var(--color-slate-200); }
+.icon-btn:hover { border-color: var(--color-brand-500); }
+
+}
+.app-sheet { background: var(--color-slate-50); }
+.dark .app-sheet { background: var(--color-slate-950); }
+.sheet-row { color: var(--color-slate-800); }
+.dark .sheet-row { color: var(--color-slate-200); }
+.sheet-row-on { background: #151715; color: #fff; }
+.dark .sheet-row-on { background: #fff; color: #0a0b0a; }
+
+/* page head, rule with plus markers, notes */
+.frame-rule { position: relative; height: 0; border-top: 1px solid var(--hair); }
+.frame-rule i { position: absolute; top: -7px; width: 13px; height: 13px; }
+.frame-rule i:first-child { left: -7px; } .frame-rule i:last-child { right: -7px; }
+.frame-rule i::before, .frame-rule i::after { content: ""; position: absolute; background: var(--color-brand-600); }
+.frame-rule i::before { left: 6px; top: 0; width: 1px; height: 13px; } .frame-rule i::after { top: 6px; left: 0; height: 1px; width: 13px; }
+.dark .frame-rule i::before, .dark .frame-rule i::after { background: var(--color-brand-400); }
+@layer components {
+.chip-demo { display: inline-flex; align-items: center; gap: .5rem; border: 1px dashed var(--hair); border-radius: 999px; padding: .35rem .75rem; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--color-slate-500); }
+}
+.demo-note { border: 1px solid rgba(217, 119, 6, .35); background: rgba(245, 158, 11, .09); border-radius: 16px; padding: .85rem 1.1rem; font-size: .875rem; color: #78350f; }
+.dark .demo-note { color: #fcd9a0; background: rgba(245, 158, 11, .08); border-color: rgba(245, 158, 11, .25); }
+.app-foot { border-top: 1px solid var(--hair); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; line-height: 1.8; color: var(--color-slate-500); }
+
+/* cards, tables and fields inside the dashboard */
+.app-shell .card { border-radius: 22px; border-color: var(--hair); background-color: var(--color-white); box-shadow: 0 1px 0 rgba(60, 50, 20, .03); }
+.dark .app-shell .card { background-color: #101210; background-image: none; box-shadow: none; }
+.app-shell .card:hover { border-color: color-mix(in srgb, var(--color-brand-500) 45%, var(--hair)); }
+.dark .app-shell .card:hover { border-color: rgba(61, 220, 151, .3); }
+.app-shell th { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.app-shell input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), .app-shell select, .app-shell textarea { border-radius: 12px; }
+.app-shell input:focus-visible, .app-shell select:focus-visible, .app-shell textarea:focus-visible, .app-shell button:focus-visible, .app-shell a:focus-visible { outline: 2px solid var(--color-brand-500); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .nav-pop { animation: none; } }

@@ -8,7 +8,7 @@ export default function Overview({ data }) {
   const rest = k.report_footprint_tco2e - k.covered_tco2e
   const donut = [
     { name: 'Electricity + generator diesel', value: k.covered_tco2e, color: COLORS.electricity },
-    { name: 'Rest of footprint (no time series)', value: rest, color: '#cbd5e1' },
+    { name: 'Rest of footprint (no time series)', value: rest, color: t.rest },
   ]
   const monthly = data.real_monthly.map((r) => ({
     month: monthName(r.month),
@@ -26,7 +26,7 @@ export default function Overview({ data }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card title="Monthly emissions (demo year)" subtitle="Fake monthly totals x emission factor" badge={<Real />} className="lg:col-span-2">
+        <Card title="Monthly emissions (demo year)" subtitle="Sample monthly totals x emission factor" badge={<Real />} className="lg:col-span-2">
           <div className="h-72">
             <ResponsiveContainer>
               <BarChart data={monthly} margin={{ left: -10 }}>

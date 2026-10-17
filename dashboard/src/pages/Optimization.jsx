@@ -627,7 +627,7 @@ export default function Optimization({ data }) {
                       />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
                       <Line animationDuration={900} type="monotone"
-                        dataKey="optimal" name="Optimal (knapsack)" stroke="#0f766e" strokeWidth={2} dot={false} />
+                        dataKey="optimal" name="Optimal (knapsack)" stroke="var(--chart-green)" strokeWidth={2} dot={false} />
                       <Line animationDuration={900} type="monotone"
                         dataKey="greedy" name="Greedy baseline" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="4 4" />
                     </LineChart>
@@ -657,7 +657,7 @@ export default function Optimization({ data }) {
                       <Bar animationDuration={900} dataKey="inr_per_tco2e" name="₹/tCO₂e" radius={[0, 4, 4, 0]}>
                         {maccData.map(m => (
                           <Cell key={m.id}
-                            fill={m.selected ? '#0f766e' : '#94a3b8'}
+                            fill={m.selected ? 'var(--chart-green)' : '#94a3b8'}
                           />
                         ))}
                       </Bar>

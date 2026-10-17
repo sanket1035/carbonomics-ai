@@ -2,7 +2,7 @@ import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Too
 import { Bus, Droplet, Gauge, Ruler, Scale, Snowflake, Star, TrendingDown } from 'lucide-react'
 import { Badge, Callout, Card, Kpi, fmt, useChartTheme } from '../ui.jsx'
 
-const TEAL = '#0f766e', SLATE = '#64748b', AMBER = '#d97706'
+const TEAL = 'var(--chart-green)', SLATE = '#64748b', AMBER = '#d97706'
 
 const signed = (n, d = 1) => `${n > 0 ? '+' : ''}${fmt(n, d)}`
 
