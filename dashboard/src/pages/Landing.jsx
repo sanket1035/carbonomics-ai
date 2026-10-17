@@ -152,6 +152,29 @@ function Feature({ icon: Icon, kind, kicker, title, text, flip }) {
   )
 }
 
+
+// Big "carbonomics" wordmark for the page bottom: the letters are a window onto a misty pine forest.
+// The picture is drawn by scripts/make_wordmark_forest.py (procedural, no stock photo).
+function Wordmark() {
+  return (
+    <svg viewBox="0 0 1200 232" className="mx-auto block w-full max-w-6xl select-none" role="img" aria-label="Carbonomics">
+      <defs>
+        <linearGradient id="wm-soft" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".55" /><stop offset=".5" stopColor="#fff" stopOpacity="1" />
+        </linearGradient>
+        <mask id="wm-mask"><rect width="1200" height="232" fill="url(#wm-soft)" /></mask>
+        <clipPath id="wm-clip">
+          <text x="600" y="212" textAnchor="middle" fontFamily="Newsreader, Georgia, serif" fontWeight="500" fontSize="250" letterSpacing="-6" textLength="1180" lengthAdjust="spacingAndGlyphs">carbonomics</text>
+        </clipPath>
+      </defs>
+      <g clipPath="url(#wm-clip)" mask="url(#wm-mask)">
+        <rect width="1200" height="232" fill="#a6d2c8" />
+        <image href="./wordmark-forest.webp" width="1200" height="232" preserveAspectRatio="xMidYMid slice" />
+      </g>
+    </svg>
+  )
+}
+
 export default function Landing() {
   const [menu, setMenu] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -300,7 +323,7 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      <footer className="border-t border-white/10 bg-slate-950 py-8">
+      <footer className="border-t border-white/10 bg-slate-950 pb-0 pt-8">
         <div className="mx-auto max-w-6xl space-y-2 px-4 text-xs leading-relaxed text-white/40 sm:px-8">
           <div className="mb-3 flex items-center gap-2.5">
             <img src="./logo.svg" alt="Carbonomics-AI logo" className="h-10 w-10 rounded-lg" />
@@ -310,6 +333,7 @@ export default function Landing() {
           <p>© 2026 Team Carbonomics. All rights reserved. The content, design, data and code of this site may not be copied, reproduced, scraped or reused without written permission.</p>
           <p>Contact: <a className="underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> · <a className="underline" href="#privacy">Privacy Policy</a> · <a className="underline" href="#terms">Terms of Use</a></p>
         </div>
+        <div className="mt-10 overflow-hidden px-4 sm:px-8"><Wordmark /></div>
       </footer>
     </div>
   )
