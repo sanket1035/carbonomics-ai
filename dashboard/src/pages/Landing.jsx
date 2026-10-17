@@ -274,18 +274,15 @@ export default function Landing() {
           ))}
         </div>
         <Reveal>
-          <div className="relative mt-10 overflow-hidden rounded-2xl border border-teal-400/40 bg-gradient-to-br from-teal-400/[.10] via-white/[.03] to-transparent p-6 shadow-[0_0_40px_-12px_rgba(45,212,191,.45)] sm:p-8">
-            <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-teal-400/20 blur-3xl" aria-hidden="true" />
-            <div className="relative grid gap-6 md:grid-cols-[1fr_auto_1.1fr] md:items-center md:gap-8">
-              <div>
-                <h3 className="font-display text-3xl text-white sm:text-4xl">Special Thanks</h3>
-                <div className="mt-3 h-1 w-12 rounded-full bg-teal-300" aria-hidden="true" />
-                <p className="mt-6 text-2xl font-bold text-white sm:text-3xl">Dr. Sneha Arjun Khaire</p>
-                <p className="mt-1 text-lg font-medium text-teal-300">Assistant Professor</p>
-                <p className="mt-2 text-base leading-relaxed text-white/70">Department of AI &amp; DS, K. K. Wagh Institute of Engineering Education and Research (KKWIEER), Nashik</p>
+          <div className="relative mx-auto mt-10 max-w-xl overflow-hidden rounded-xl border border-teal-400/40 bg-gradient-to-br from-teal-400/[.10] via-white/[.03] to-transparent px-5 py-4 shadow-[0_0_30px_-14px_rgba(45,212,191,.45)] sm:px-6">
+            <div className="pointer-events-none absolute -left-8 -top-8 h-28 w-28 rounded-full bg-teal-400/20 blur-3xl" aria-hidden="true" />
+            <div className="relative flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-6">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[.2em] text-teal-300">Special Thanks</p>
+                <p className="mt-1 text-lg font-semibold text-white">Dr. Sneha Arjun Khaire</p>
+                <p className="text-sm text-white/60"><span className="text-teal-300">Assistant Professor</span> · Dept. of AI &amp; DS, KKWIEER, Nashik</p>
               </div>
-              <div className="h-px bg-white/10 md:h-24 md:w-px" aria-hidden="true" />
-              <p className="text-base leading-relaxed text-white/60 sm:text-lg">Our project guide, for her continuous support, valuable suggestions and guidance throughout the project.</p>
+              <p className="text-sm leading-relaxed text-white/50 sm:max-w-[15rem] sm:border-l sm:border-white/10 sm:pl-5">Our project guide, for her support and guidance.</p>
             </div>
           </div>
         </Reveal>
