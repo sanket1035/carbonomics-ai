@@ -159,11 +159,15 @@ function Wordmark() {
   return (
     <svg viewBox="0 0 1200 232" className="mx-auto block w-full max-w-6xl select-none" role="img" aria-label="Carbonomics">
       <defs>
+        <linearGradient id="wm-soft" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".55" /><stop offset=".5" stopColor="#fff" stopOpacity="1" />
+        </linearGradient>
+        <mask id="wm-mask"><rect width="1200" height="232" fill="url(#wm-soft)" /></mask>
         <clipPath id="wm-clip">
           <text x="600" y="212" textAnchor="middle" fontFamily="Newsreader, Georgia, serif" fontWeight="500" fontSize="250" letterSpacing="-6" textLength="1180" lengthAdjust="spacingAndGlyphs">carbonomics</text>
         </clipPath>
       </defs>
-      <g clipPath="url(#wm-clip)">
+      <g clipPath="url(#wm-clip)" mask="url(#wm-mask)">
         <rect width="1200" height="232" fill="#a6d2c8" />
         <image href="./wordmark-forest.webp" width="1200" height="232" preserveAspectRatio="xMidYMid slice" />
       </g>

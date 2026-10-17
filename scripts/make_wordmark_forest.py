@@ -17,7 +17,7 @@ def lerp(a, b, t):
 
 
 def sky():
-    top, bot = (236, 246, 243), (190, 220, 211)
+    top, bot = (30, 62, 57), (132, 182, 170)
     img = Image.new("RGB", (W, H))
     d = ImageDraw.Draw(img)
     for y in range(H):
@@ -69,7 +69,7 @@ def fog(strength, y0, y1, left_extra):
     noise = (noise - noise.min()) / (noise.max() - noise.min())
     a = np.clip(a * (0.75 + 0.5 * noise), 0, 1)
     im = np.zeros((H, W, 4), np.uint8)
-    im[..., :3] = (232, 243, 240)
+    im[..., :3] = (150, 198, 186)
     im[..., 3] = (a * 255).astype(np.uint8)
     return Image.fromarray(im, "RGBA")
 
@@ -79,19 +79,19 @@ img = sky().convert("RGBA")
 mt = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(mt)
 xs = np.arange(0, W + 40, 40)
 ridge = 260 + 28 * np.sin(xs / 260) + 18 * np.sin(xs / 90 + 1) + rng.normal(0, 4, len(xs))
-d.polygon([(0, H)] + list(zip(xs, ridge)) + [(W, H)], fill=(150, 192, 182, 255))
+d.polygon([(0, H)] + list(zip(xs, ridge)) + [(W, H)], fill=(92, 144, 133, 255))
 img.alpha_composite(mt.filter(ImageFilter.GaussianBlur(5)))
 img.alpha_composite(fog(0.7, 200, 330, 0.5))
 # conifer layers, far to near
 for base, hmin, hmax, step, col, blur, bias, fg in [
-    (330, 90, 150, 26, (118, 168, 156), 3.2, 0.2, 0.40),
+    (330, 90, 150, 26, (100, 154, 142), 3.2, 0.2, 0.40),
     (370, 120, 210, 30, (84, 136, 124), 2.2, 0.35, 0.28),
     (410, 170, 290, 38, (64, 120, 108), 1.2, 0.5, 0.16),
     (470, 250, 420, 52, (38, 88, 79), 0.5, 0.6, 0.05),
 ]:
     img.alpha_composite(layer(base, hmin, hmax, step, col, blur, bias))
     img.alpha_composite(fog(fg, base - hmax * 0.8, base - 10, 1.6))
-img.alpha_composite(fog(0.42, 0, H * 0.55, 1.2))  # light haze at the top, strongest on the left
+img.alpha_composite(fog(0.22, H * 0.35, H * 0.8, 1.2))  # soft haze in the middle, strongest on the left
 out = img.convert("RGB")
 out = Image.blend(out, out.filter(ImageFilter.GaussianBlur(0.8)), 0.25)
 out.save(os.path.join(root, "dashboard/public/wordmark-forest.webp"), quality=86)
