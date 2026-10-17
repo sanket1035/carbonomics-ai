@@ -4,9 +4,9 @@ import { ArrowRight, ChevronDown, Home, Lock, LogOut, Menu, Moon, Sun, Upload as
 // Top navigation of the dashboard: logo, grouped menus (a group with one page is a plain link), theme, account.
 // The pages themselves come from App.jsx; this file only draws and opens/closes menus.
 export const GROUPS = [
-  { id: 'insights', label: 'Insights', blurb: 'Read your numbers: totals, patterns and what comes next.', ids: ['overview', 'trends', 'forecast'], tone: 'from-[#8fc6b7] via-[#a6d2c8] to-[#cfe5d5]' },
-  { id: 'plan', label: 'Plan', blurb: 'Test changes, find the best mix and audit the energy use.', ids: ['simulation', 'optimization', 'energyaudit', 'factorchange'], tone: 'from-indigo-300 via-violet-200 to-white' },
-  { id: 'data', label: 'My data', blurb: 'Bring your own file and keep every analysis.', ids: ['upload', 'history'], tone: 'from-amber-300 via-orange-200 to-white' },
+  { id: 'insights', label: 'Insights', blurb: 'Read your numbers: totals, patterns and what comes next.', ids: ['overview', 'trends', 'forecast'] },
+  { id: 'plan', label: 'Plan', blurb: 'Test changes, find the best mix and audit the energy use.', ids: ['simulation', 'optimization', 'energyaudit', 'factorchange'] },
+  { id: 'data', label: 'My data', blurb: 'Bring your own file and keep every analysis.', ids: ['upload', 'history'] },
 ]
 
 export function groupOf(pageId) {
@@ -88,8 +88,7 @@ export default function AppNav({ pages, current, go, loggedIn, dark, setDark, se
                         <div className="grid gap-0.5 sm:grid-cols-2">{g.items.map((p) => item(p, go))}</div>
                       </div>
                       <div className="hidden md:block">
-                        <div className={`h-28 rounded-2xl bg-gradient-to-br ${g.tone} grain`} aria-hidden="true" />
-                        <div className="mt-3 text-sm font-semibold text-white">{g.label}</div>
+                        <div className="text-sm font-semibold text-white">{g.label}</div>
                         <p className="mt-1 text-xs leading-relaxed text-white/55">{g.blurb}</p>
                       </div>
                     </div>
