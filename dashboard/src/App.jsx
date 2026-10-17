@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BarChart3, ClipboardCheck, FlaskConical, Scale, Gauge, History as HistoryIcon, Home, LineChart as LineIcon, LogOut, Lock, Menu, Moon, Sun, Target, Upload as UploadIcon, X } from 'lucide-react'
+import { BarChart3, ClipboardCheck, FlaskConical, Scale, Gauge, History as HistoryIcon, LineChart as LineIcon, Target, Upload as UploadIcon } from 'lucide-react'
 import { Synthetic, ThemeCtx } from './ui.jsx'
 import Overview from './pages/Overview.jsx'
 import Trends from './pages/Trends.jsx'
@@ -15,17 +15,18 @@ import Login from './pages/Login.jsx'
 import { Privacy, Terms } from './pages/Legal.jsx'
 import { authConfigured, signOut, useAuth } from './auth.js'
 import { api } from './api.js'
+import AppNav, { groupOf } from './AppNav.jsx'
 
 const PAGES = [
-  { id: 'overview', label: 'Overview', icon: Gauge, C: Overview, demo: true },
-  { id: 'trends', label: 'Trends', icon: LineIcon, C: Trends, demo: true },
-  { id: 'forecast', label: 'Forecast', icon: BarChart3, C: Forecast, demo: true },
-  { id: 'simulation', label: 'Simulation', icon: FlaskConical, C: Simulation, demo: true },
-  { id: 'optimization', label: 'Optimization', icon: Target, C: Optimization, demo: true },
-  { id: 'energyaudit', label: 'Energy Audit', icon: ClipboardCheck, C: EnergyAudit, demo: true },
-  { id: 'factorchange', label: 'Why it changed', icon: Scale, C: Overview, demo: true, mineOnly: true },
-  { id: 'upload', label: 'Upload your data', icon: UploadIcon, C: Upload, locked: true, needsData: false },
-  { id: 'history', label: 'History', icon: HistoryIcon, C: HistoryPage, locked: true, needsData: false },
+  { id: 'overview', label: 'Overview', icon: Gauge, C: Overview, demo: true, desc: 'Totals, scopes and sources', blurb: 'Where the emissions come from, in one view.' },
+  { id: 'trends', label: 'Trends', icon: LineIcon, C: Trends, demo: true, desc: 'Weekly and monthly patterns', blurb: 'How electricity, diesel and emissions move over time.' },
+  { id: 'forecast', label: 'Forecast', icon: BarChart3, C: Forecast, demo: true, desc: 'Next weeks against a naive guess', blurb: 'The next weeks of use, compared honestly with a naive guess.' },
+  { id: 'simulation', label: 'Simulation', icon: FlaskConical, C: Simulation, demo: true, desc: 'What-if on electricity and diesel', blurb: 'Change electricity or diesel use and see what it does to emissions.' },
+  { id: 'optimization', label: 'Optimization', icon: Target, C: Optimization, demo: true, desc: 'Best mix within a budget', blurb: 'Pick the mix of measures that cuts the most within your budget.' },
+  { id: 'energyaudit', label: 'Energy Audit', icon: ClipboardCheck, C: EnergyAudit, demo: true, desc: 'kWh per m² and saving ideas', blurb: 'Electricity per square metre against benchmarks, and where savings could come from.' },
+  { id: 'factorchange', label: 'Why it changed', icon: Scale, C: Overview, demo: true, mineOnly: true, desc: 'Use effect vs emission-factor effect', blurb: 'Split a change in emissions into less use and a cleaner grid.' },
+  { id: 'upload', label: 'Upload your data', icon: UploadIcon, C: Upload, locked: true, needsData: false, desc: 'CSV or Excel, analysed in seconds', blurb: 'Analyse your own CSV or Excel file.' },
+  { id: 'history', label: 'History', icon: HistoryIcon, C: HistoryPage, locked: true, needsData: false, desc: 'Saved analyses and plans', blurb: 'Every analysis and plan you saved, ready to reopen.' },
 ]
 
 const readTheme = () => {
@@ -99,12 +100,6 @@ export default function App() {
 }
 
 function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
-  const [open, setOpen] = useState(false)
-  // Desktop sidebar can be closed with the cross and reopened from the header; the choice is remembered in this browser.
-  const [collapsed, setCollapsed] = useState(() => { try { return localStorage.getItem('sidebar-collapsed') === '1' } catch { return false } })
-  useEffect(() => { try { localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0') } catch { /* private window: the sidebar still works */ } }, [collapsed])
-  const openMenu = () => { if (window.matchMedia('(min-width: 1024px)').matches) setCollapsed((c) => !c); else setOpen(true) }
-  const closeMenu = () => { setOpen(false); setCollapsed(true) }
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [analysis, setAnalysis] = useState(readSaved)   // { result, fileName } of the file the user analysed or opened from History
@@ -120,7 +115,6 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   }, [])
 
   const go = (id) => {
-    setOpen(false)
     const p = PAGES.find((x) => x.id === id)
     location.hash = p?.locked && !loggedIn ? `login?next=${id}` : demo && p?.demo ? `demo/${id}` : id
   }
@@ -149,72 +143,43 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const visiblePages = mine
     ? [PAGES.find((p) => p.id === 'upload'), ...(analysis ? PAGES.filter((p) => p.demo) : []), PAGES.find((p) => p.id === 'history')]
     : PAGES.filter((p) => !p.mineOnly && !(demo && session && p.locked))
-  const nav = (
-    <nav className="flex flex-col gap-1">
-      {visiblePages.map(({ id, label, icon: Icon, locked }) => (
-        <button key={id} onClick={() => go(id)}
-          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${current.id === id ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'}`}>
-          <Icon size={18} /> <span className="flex-1 text-left">{label}</span>
-          {locked && !loggedIn && <Lock size={13} className="opacity-60" aria-label="Login required" />}
-        </button>
-      ))}
-    </nav>
-  )
+  const group = groupOf(current.id)
+  const signOutNow = () => signOut().then(() => { try { sessionStorage.removeItem(SAVED_KEY) } catch { /* ignore */ } location.hash = 'home' })
 
   return (
     <ThemeCtx.Provider value={{ dark }}>
-      <div className={`min-h-screen ${collapsed ? '' : 'lg:grid lg:grid-cols-[250px_1fr]'}`}>
-        <aside className={`${open ? 'fixed inset-0 z-40 block overflow-y-auto bg-white p-5 dark:bg-slate-950' : 'hidden'} ${collapsed ? 'lg:hidden' : 'lg:block'} lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-r lg:border-slate-200 lg:bg-white lg:p-5 dark:lg:border-slate-800 dark:lg:bg-slate-950`}>
-          <div className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <img src="./favicon.svg" alt="" className="h-9 w-9" />
-              <div>
-                <div className="font-semibold leading-tight text-slate-900 dark:text-white">Carbonomics-AI</div>
-                <div className="muted text-xs">Carbon intelligence</div>
+      <div className="app-shell min-h-screen">
+        <div className="app-frame mx-auto flex min-h-screen max-w-[1320px] flex-col">
+          <AppNav pages={visiblePages} current={current} go={go} loggedIn={loggedIn} dark={dark} setDark={setDark}
+            session={session} profile={profile} authConfigured={authConfigured} onSignOut={signOutNow} demo={demo} showBackToData={demo && Boolean(session)} />
+
+          <div className="frame-rule" aria-hidden="true"><i /><i /></div>
+
+          <div className="mx-auto w-full max-w-[1200px] flex-1 px-4 sm:px-8">
+            <div className="page-head page-in flex flex-wrap items-end justify-between gap-4 pb-6 pt-8 sm:pt-12">
+              <div className="min-w-0">
+                <div className="kicker">{group ? `${group.label} / ` : ''}{current.label}</div>
+                <h1 className="mt-2 text-4xl leading-[1.05] text-slate-900 sm:text-5xl dark:text-white">{current.label}</h1>
+                <p className="muted mt-3 max-w-2xl text-[15px] leading-relaxed">{current.blurb}</p>
               </div>
+              {needsData && <span className="chip-demo">Demo numbers are <Synthetic /></span>}
             </div>
-            <button className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={closeMenu} aria-label="Close menu" title="Close menu"><X size={22} /></button>
+
+            <main key={page} className="page-in space-y-6 pb-14">
+              {needsData && <div className="demo-note"><b>Demo with FAKE data.</b> Every number on this page is random and made up for illustration. It is not from any real campus.</div>}
+              {needsData && error && <div className="card text-sm text-rose-600">{error}</div>}
+              {needsData && !error && !data && <div className="muted text-sm">Loading…</div>}
+              {needsData && data && <Page data={data} />}
+              {mine && current.demo && !analysis && <div className="card text-sm">Upload a file first, then the results appear here. <a className="underline" href="#upload">Go to Upload</a></div>}
+              {mine && current.demo && analysis && <MyPage a={analysis} plan={plan} onPlan={setPlan} />}
+              {!mine && !needsData && <Page />}
+              {mine && !current.demo && <Page analysis={analysis} onResult={showResult} onOpenAnalysis={openAnalysis} />}
+            </main>
           </div>
-          {nav}
-          <a href="#home" className="muted mt-4 flex items-center gap-3 px-3 py-2 text-sm hover:underline"><Home size={16} /> Home</a>
-          {demo && session && <a href="#upload" className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-brand-600 hover:bg-slate-100 dark:text-brand-300 dark:hover:bg-slate-800"><UploadIcon size={16} /> Back to my data</a>}
-          {!mine && <p className="muted mt-8 text-xs leading-relaxed">Demo campus · FAKE data<br />Random numbers, not a real campus</p>}
-        </aside>
 
-        <div className="min-w-0">
-          <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur sm:px-8 dark:border-slate-800 dark:bg-slate-950/80">
-            <div className="flex items-center gap-3">
-              <button className={`rounded-lg p-1 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${collapsed ? '' : 'lg:hidden'}`} onClick={openMenu} aria-label="Open menu" title="Open menu"><Menu size={22} /></button>
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-white">{current.label}</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              {needsData && <span className="hidden sm:inline-flex items-center gap-2 text-xs muted">Demo numbers are <Synthetic /></span>}
-              {authConfigured && (session
-                ? (
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="muted hidden max-w-[14rem] truncate md:inline" title={session.email}>{profile?.full_name || session.email}{profile?.role && profile.role !== 'other' ? ` (${profile.role})` : ''}</span>
-                    <button onClick={() => signOut().then(() => { try { sessionStorage.removeItem(SAVED_KEY) } catch { /* ignore */ } location.hash = 'home' })} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800"><LogOut size={15} /> Log out</button>
-                  </div>
-                )
-                : <a href="#login" className="rounded-xl bg-brand-600 px-3 py-2 text-xs font-medium text-white hover:bg-brand-700">Log in</a>)}
-              <button onClick={() => setDark(!dark)} aria-label="Toggle dark mode"
-                className="rounded-xl p-2 text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800">
-                {dark ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-            </div>
-          </header>
-
-          <main key={page} className="page-in mx-auto max-w-7xl px-4 py-6 sm:px-8">
-            {needsData && <div className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950 dark:text-amber-200 dark:ring-amber-900"><b>Demo with FAKE data.</b> Every number on this page is random and made up for illustration. It is not from any real campus.</div>}
-            {needsData && error && <div className="card text-sm text-rose-600">{error}</div>}
-            {needsData && !error && !data && <div className="muted text-sm">Loading…</div>}
-            {needsData && data && <Page data={data} />}
-            {mine && current.demo && !analysis && <div className="card text-sm">Upload a file first, then the results appear here. <a className="underline" href="#upload">Go to Upload</a></div>}
-            {mine && current.demo && analysis && <MyPage a={analysis} plan={plan} onPlan={setPlan} />}
-            {!mine && !needsData && <Page />}
-            {mine && !current.demo && <Page analysis={analysis} onResult={showResult} onOpenAnalysis={openAnalysis} />}
-          </main>
-          <footer className="muted px-4 pb-8 text-center text-xs sm:px-8">Carbonomics-AI · final-year project, KKWIEER Nashik · © 2026 Team Carbonomics, all rights reserved · <a className="underline" href="#privacy">Privacy</a> · <a className="underline" href="#terms">Terms</a> {!mine && ' · all numbers in this demo are FAKE, made up for illustration.'}</footer>
+          <footer className="app-foot px-4 py-6 text-center sm:px-8">
+            Carbonomics-AI · final-year project, KKWIEER Nashik · © 2026 Team Carbonomics, all rights reserved · <a className="underline" href="#privacy">Privacy</a> · <a className="underline" href="#terms">Terms</a>{!mine && ' · all numbers in this demo are FAKE, made up for illustration.'}
+          </footer>
         </div>
       </div>
     </ThemeCtx.Provider>

@@ -26,10 +26,11 @@ export const ThemeCtx = createContext({ dark: false })
 export const useChartTheme = () => {
   const { dark } = useContext(ThemeCtx)
   return {
-    grid: dark ? '#1e293b' : '#e2e8f0',
-    axis: dark ? '#94a3b8' : '#64748b',
-    tip: { backgroundColor: dark ? '#0f172a' : '#fff', border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`, borderRadius: 12, color: dark ? '#e2e8f0' : '#0f172a' },
-    actual: dark ? '#f8fafc' : '#0f172a',
+    grid: dark ? '#1f231f' : '#e6dfcb',
+    axis: dark ? '#9aa39b' : '#6b665a',
+    tip: { backgroundColor: dark ? '#131513' : '#fffdf8', border: `1px solid ${dark ? '#2a2e2a' : '#e6dfcb'}`, borderRadius: 14, color: dark ? '#e6e8e6' : '#14120d' },
+    actual: dark ? '#f5f5f0' : '#14120d',
+    rest: dark ? '#3a403a' : '#d9d2bd',
   }
 }
 
@@ -97,7 +98,7 @@ export function Kpi({ label, value, unit, sub, icon: Icon, badge }) {
   return (
     <div className="card rise transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between">
-        <span className="muted text-xs font-medium uppercase tracking-wide">{label}</span>
+        <span className="muted font-mono text-[10.5px] font-medium uppercase tracking-[.08em]">{label}</span>
         {Icon && <span className="rounded-lg bg-brand-50 p-2 text-brand-600 dark:bg-slate-800 dark:text-brand-500"><Icon size={16} /></span>}
       </div>
       <div className="mt-3 flex items-baseline gap-1.5">
