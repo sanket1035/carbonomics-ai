@@ -78,7 +78,7 @@ export default function App() {
 
   // Without Supabase settings (local development) the locked pages stay open; the API still decides what it accepts.
   const loggedIn = Boolean(session) || !authConfigured
-  // '#demo/trends' always shows the fake-data demo, even for a logged-in user; plain '#trends' shows their own data.
+  // '#demo/trends' always shows the sample-data demo, even for a logged-in user; plain '#trends' shows their own data.
   const demo = route.startsWith('demo/')
   const pageId = demo ? route.slice(5) : route
   const demoOk = PAGES.some((p) => p.id === pageId && p.demo && !p.mineOnly)
@@ -105,7 +105,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const [analysis, setAnalysis] = useState(readSaved)   // { result, fileName } of the file the user analysed or opened from History
   const [plan, setPlanState] = useState(readPlan)  // optimization inputs, added to the PDF report
   const setPlan = (p) => { setPlanState(p); writePlan(p) }
-  const mine = Boolean(session) && !demo                    // logged-in users see their own data, visitors see the fake demo
+  const mine = Boolean(session) && !demo                    // logged-in users see their own data, visitors see the sample demo
 
   useEffect(() => {
     fetch('./data/dashboard.json')
@@ -139,7 +139,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const MINE = { overview: MyOverview, trends: MyTrends, forecast: MyForecast, simulation: MySimulation, optimization: MyOptimization, energyaudit: MyEnergyAudit, factorchange: FactorChange }
   const MyPage = mine ? MINE[current.id] : null
 
-  // Logged-in users get the result pages only once they have a file analysed; visitors get the fake-data demo.
+  // Logged-in users get the result pages only once they have a file analysed; visitors get the sample-data demo.
   const visiblePages = mine
     ? [PAGES.find((p) => p.id === 'upload'), ...(analysis ? PAGES.filter((p) => p.demo) : []), PAGES.find((p) => p.id === 'history')]
     : PAGES.filter((p) => !p.mineOnly && !(demo && session && p.locked))
@@ -166,7 +166,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
             </div>
 
             <main key={page} className="page-in space-y-6 pb-14">
-              {needsData && <div className="demo-note"><b>Demo with FAKE data.</b> Every number on this page is random and made up for illustration. It is not from any real campus.</div>}
+              {needsData && <div className="demo-note"><b>Demo with SAMPLE data.</b> Every number on this page is random and made up for illustration. It is not from any real campus.</div>}
               {needsData && error && <div className="card text-sm text-rose-600">{error}</div>}
               {needsData && !error && !data && <div className="muted text-sm">Loading…</div>}
               {needsData && data && <Page data={data} />}
@@ -178,7 +178,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
           </div>
 
           <footer className="app-foot px-4 py-6 text-center sm:px-8">
-            Carbonomics-AI · final-year project, KKWIEER Nashik · © 2026 Team Carbonomics, all rights reserved · <a className="underline" href="#privacy">Privacy</a> · <a className="underline" href="#terms">Terms</a>{!mine && ' · all numbers in this demo are FAKE, made up for illustration.'}
+            Carbonomics-AI · final-year project, KKWIEER Nashik · © 2026 Team Carbonomics, all rights reserved · <a className="underline" href="#privacy">Privacy</a> · <a className="underline" href="#terms">Terms</a>{!mine && ' · all numbers in this demo are SAMPLE, made up for illustration.'}
           </footer>
         </div>
       </div>

@@ -235,7 +235,7 @@ export default function Simulation({ data }) {
               />
               {data.solar && (
                 <p className="muted -mt-3 text-xs leading-relaxed">
-                  Existing rooftop solar (FAKE demo numbers): ~{fmt(data.solar.avg_kwh_per_month)} kWh/month, already self-consumed and not in the grid
+                  Existing rooftop solar (SAMPLE demo numbers): ~{fmt(data.solar.avg_kwh_per_month)} kWh/month, already self-consumed and not in the grid
                   figures above. This slider adds <em>new</em> solar on top.
                 </p>
               )}
@@ -307,7 +307,7 @@ export default function Simulation({ data }) {
               label="Baseline tCO₂e"
               value={fmt(ann.baseline_total_tco2e, 1)}
               unit="tCO₂e/yr"
-              sub="Fake monthly × factor"
+              sub="Sample monthly × factor"
               badge={<Real />}
               icon={Zap}
             />
@@ -339,7 +339,7 @@ export default function Simulation({ data }) {
           {/* baseline vs scenario monthly chart */}
           <Card
             title="Monthly emissions: Baseline vs Scenario"
-            subtitle="tCO₂e per month (fake baseline, accounting formula)"
+            subtitle="tCO₂e per month (sample baseline, accounting formula)"
             badge={<Real />}
           >
             <div className="h-64">
@@ -393,7 +393,7 @@ export default function Simulation({ data }) {
               <ScopeDonut
                 scope1={ann.baseline_scope1_tco2e}
                 scope2={ann.baseline_scope2_tco2e}
-                label="Baseline (fake)"
+                label="Baseline (sample)"
               />
               <ScopeDonut
                 scope1={ann.scenario_scope1_tco2e}

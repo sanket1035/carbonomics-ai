@@ -42,7 +42,7 @@ export default function Forecast({ data }) {
         <div className="flex gap-2">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" />
           <span>
-            All data in this demo is fake, so these scores only show that the pipeline works, not real forecasting accuracy.{' '}
+            All data in this demo is sample, so these scores only show that the pipeline works, not real forecasting accuracy.{' '}
             {electricityBeats ? 'At least one model beats the naive last-week guess for electricity.' : 'No model beats the naive last-week guess for electricity.'} Split is time-based: the last 10 weeks are the test set.
           </span>
         </div>

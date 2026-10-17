@@ -26,7 +26,7 @@ export default function Overview({ data }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card title="Monthly emissions (demo year)" subtitle="Fake monthly totals x emission factor" badge={<Real />} className="lg:col-span-2">
+        <Card title="Monthly emissions (demo year)" subtitle="Sample monthly totals x emission factor" badge={<Real />} className="lg:col-span-2">
           <div className="h-72">
             <ResponsiveContainer>
               <BarChart data={monthly} margin={{ left: -10 }}>

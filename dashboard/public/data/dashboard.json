@@ -1,9 +1,9 @@
 {
  "meta": {
   "title": "Carbonomics-AI",
-  "campus": "Demo campus (FAKE data)",
-  "period": "Demo year (fake)",
-  "weekly_label": "FAKE demo data (random numbers, not a real campus)",
+  "campus": "Demo campus (SAMPLE data)",
+  "period": "Demo year (sample)",
+  "weekly_label": "SAMPLE demo data (made-up numbers, not a real campus)",
   "weekly_assumptions": {
    "electricity_weekday_weight": {
     "Mon-Fri": 1.0,
@@ -25,16 +25,16 @@
   "diesel_tco2e": 1.75,
   "covered_tco2e": 357.34,
   "report_footprint_tco2e": 1786.7,
-  "report_source": "FAKE demo figure",
+  "report_source": "SAMPLE demo figure",
   "covered_share_of_footprint": 0.2,
-  "basis": "FAKE monthly totals x emission factor"
+  "basis": "SAMPLE monthly totals x emission factor"
  },
  "real_monthly": [
   {
    "month": "2025-01",
    "electricity_kwh": 34325,
    "dg_diesel_litres": 63,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 24.371,
    "diesel_tco2e": 0.182
   },
@@ -42,7 +42,7 @@
    "month": "2025-02",
    "electricity_kwh": 38435,
    "dg_diesel_litres": 71,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 27.289,
    "diesel_tco2e": 0.205
   },
@@ -50,7 +50,7 @@
    "month": "2025-03",
    "electricity_kwh": 43927,
    "dg_diesel_litres": 54,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 31.188,
    "diesel_tco2e": 0.156
   },
@@ -58,7 +58,7 @@
    "month": "2025-04",
    "electricity_kwh": 47549,
    "dg_diesel_litres": 77,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 33.76,
    "diesel_tco2e": 0.223
   },
@@ -66,7 +66,7 @@
    "month": "2025-05",
    "electricity_kwh": 49523,
    "dg_diesel_litres": 49,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 35.161,
    "diesel_tco2e": 0.142
   },
@@ -74,7 +74,7 @@
    "month": "2025-06",
    "electricity_kwh": 43464,
    "dg_diesel_litres": 40,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 30.859,
    "diesel_tco2e": 0.116
   },
@@ -82,7 +82,7 @@
    "month": "2025-07",
    "electricity_kwh": 39638,
    "dg_diesel_litres": 36,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 28.143,
    "diesel_tco2e": 0.104
   },
@@ -90,7 +90,7 @@
    "month": "2025-08",
    "electricity_kwh": 36336,
    "dg_diesel_litres": 32,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 25.799,
    "diesel_tco2e": 0.092
   },
@@ -98,7 +98,7 @@
    "month": "2025-09",
    "electricity_kwh": 42770,
    "dg_diesel_litres": 54,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 30.367,
    "diesel_tco2e": 0.156
   },
@@ -106,7 +106,7 @@
    "month": "2025-10",
    "electricity_kwh": 43033,
    "dg_diesel_litres": 47,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 30.553,
    "diesel_tco2e": 0.136
   },
@@ -114,7 +114,7 @@
    "month": "2025-11",
    "electricity_kwh": 42136,
    "dg_diesel_litres": 65,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 29.917,
    "diesel_tco2e": 0.188
   },
@@ -122,7 +122,7 @@
    "month": "2025-12",
    "electricity_kwh": 39704,
    "dg_diesel_litres": 16,
-   "source": "FAKE demo data (random numbers, not a real campus)",
+   "source": "SAMPLE demo data (made-up numbers, not a real campus)",
    "electricity_tco2e": 28.19,
    "diesel_tco2e": 0.046
   }
@@ -1053,7 +1053,7 @@
   "avg_kwh_per_month": 1091.3,
   "annual_avoided_tco2e": 9.3,
   "share_of_purchased_electricity": 0.0261,
-  "period": "2025-01 to 2025-12 (fake)",
+  "period": "2025-01 to 2025-12 (sample)",
   "factor": {
    "name": "electricity",
    "factor": 0.71,
@@ -1061,8 +1061,8 @@
    "source": "CEA, CO2 Baseline Database for the Indian Power Sector, User Guide",
    "version": "V21.0, Nov 2025"
   },
-  "note": "Fake rooftop solar numbers. Solar is self-consumed and reported separately, not netted from purchased electricity.",
-  "basis": "FAKE monthly generation"
+  "note": "Sample rooftop solar numbers. Solar is self-consumed and reported separately, not netted from purchased electricity.",
+  "basis": "SAMPLE monthly generation"
  },
  "simulation": {
   "baseline_monthly": [
@@ -1248,7 +1248,7 @@
   "coverage_note": {
    "covered_tco2e": 357.34,
    "full_footprint_tco2e": 1786.7,
-   "full_footprint_source": "FAKE demo figure",
+   "full_footprint_source": "SAMPLE demo figure",
    "covered_share_pct": 20.0,
    "covered_sources": [
     "electricity_kwh   \u00d7 electricity emission factor \u2192 Scope 2",
@@ -1322,7 +1322,7 @@
    }
   ],
   "presets_note": "Presets are ILLUSTRATIVE ASSUMPTIONS only \u2014 not measured results. Actual savings depend on implementation details, equipment specifications, and site conditions.",
-  "basis": "FAKE monthly activity \u00d7 emission factor (GHG Protocol accounting, not ML)"
+  "basis": "SAMPLE monthly activity \u00d7 emission factor (GHG Protocol accounting, not ML)"
  },
  "optimization": {
   "measures": [
@@ -1334,7 +1334,7 @@
     "status": "ready",
     "missing_fields": [],
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo",
     "capex_inr": 500000.0,
     "max_units": 5,
@@ -1371,7 +1371,7 @@
     "status": "ready",
     "missing_fields": [],
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo",
     "capex_inr": 60000.0,
     "max_units": 1,
@@ -1408,7 +1408,7 @@
     "status": "ready",
     "missing_fields": [],
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo",
     "capex_inr": 400000.0,
     "max_units": 1,
@@ -1456,7 +1456,7 @@
      "tco2e_saved": 9.94,
      "scope": "Scope 2",
      "basis": "demo",
-     "source": "FAKE demo value",
+     "source": "SAMPLE demo value",
      "source_date": "demo",
      "inr_per_tco2e": 50301.81
     }
@@ -1487,7 +1487,7 @@
       "tco2e_saved": 9.94,
       "scope": "Scope 2",
       "basis": "demo",
-      "source": "FAKE demo value",
+      "source": "SAMPLE demo value",
       "source_date": "demo",
       "inr_per_tco2e": 50301.81
      }
@@ -1535,7 +1535,7 @@
    "coverage_note": {
     "covered_tco2e": 357.342,
     "full_footprint_tco2e": 1786.7,
-    "full_footprint_source": "FAKE demo figure",
+    "full_footprint_source": "SAMPLE demo figure",
     "covered_share_pct": 20.0,
     "not_covered": [
      "Other sources of a campus footprint (commuting, waste, wastewater, buses) are not in this demo."
@@ -1547,25 +1547,25 @@
      "id": "solar_new_10kwp",
      "label": "New rooftop solar (per 10 kWp block)",
      "basis": "demo",
-     "source": "FAKE demo value",
+     "source": "SAMPLE demo value",
      "source_date": "demo"
     },
     {
      "id": "dg_scheduling",
      "label": "Generator scheduling",
      "basis": "demo",
-     "source": "FAKE demo value",
+     "source": "SAMPLE demo value",
      "source_date": "demo"
     },
     {
      "id": "dg_replace",
      "label": "Generator replaced by battery backup (30% of diesel)",
      "basis": "demo",
-     "source": "FAKE demo value",
+     "source": "SAMPLE demo value",
      "source_date": "demo"
     }
    ],
-   "basis": "FAKE monthly baseline \u00d7 emission factor; MILP (scipy.optimize.milp) for selection; not ML"
+   "basis": "SAMPLE monthly baseline \u00d7 emission factor; MILP (scipy.optimize.milp) for selection; not ML"
   },
   "greedy": {
    "method": "greedy",
@@ -1584,7 +1584,7 @@
      "tco2e_saved": 9.94,
      "scope": "Scope 2",
      "basis": "demo",
-     "source": "FAKE demo value",
+     "source": "SAMPLE demo value",
      "source_date": "demo",
      "inr_per_tco2e": 50301.81
     }
@@ -1703,7 +1703,7 @@
   "coverage_note": {
    "covered_tco2e": 357.342,
    "full_footprint_tco2e": 1786.7,
-   "full_footprint_source": "FAKE demo figure",
+   "full_footprint_source": "SAMPLE demo figure",
    "covered_share_pct": 20.0,
    "not_covered": [
     "Other sources of a campus footprint (commuting, waste, wastewater, buses) are not in this demo."
@@ -1715,31 +1715,32 @@
     "id": "solar_new_10kwp",
     "label": "New rooftop solar (per 10 kWp block)",
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo"
    },
    {
     "id": "dg_scheduling",
     "label": "Generator scheduling",
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo"
    },
    {
     "id": "dg_replace",
     "label": "Generator replaced by battery backup (30% of diesel)",
     "basis": "demo",
-    "source": "FAKE demo value",
+    "source": "SAMPLE demo value",
     "source_date": "demo"
    }
   ],
   "default_budget_inr": 500000,
-  "basis": "FAKE monthly baseline \u00d7 emission factor; MILP (scipy.optimize.milp); not ML",
+  "basis": "SAMPLE monthly baseline \u00d7 emission factor; MILP (scipy.optimize.milp); not ML",
   "status_message": null
  },
  "energy_audit": {
-  "period": "Demo year (fake)",
-  "basis": "FAKE monthly electricity / FAKE built-up area; formula only, no ML",
+  "period": "Demo year (sample)",
+  "basis": "SAMPLE monthly electricity / SAMPLE built-up area; formula only, no ML",
+  "from_upload": false,
   "zone": "composite",
   "zone_note": "The climate zone of a real site matters: the 5-star cut-off is 40 (Composite) or 45 (Warm and Humid) kWh/m2/year. The demo uses Composite.",
   "actual": {
@@ -1749,7 +1750,7 @@
    "grid_factor_unit": "kg CO2e/kWh",
    "grid_factor_source": "CEA, CO2 Baseline Database for the Indian Power Sector, User Guide, V21.0, Nov 2025",
    "built_up_area_m2": 20000.0,
-   "area_source": "FAKE demo figure",
+   "area_source": "SAMPLE demo figure",
    "epi": 25.04,
    "epi_unit": "kWh/m2/year",
    "persons": 4500,
@@ -1791,7 +1792,7 @@
    }
   ],
   "ac": {
-   "basis": "FAKE demo inventory, not metered",
+   "basis": "SAMPLE demo inventory, not metered",
    "units_total": 34,
    "sites": [
     {
@@ -1887,7 +1888,7 @@
     },
     "note": "AC electricity only, so the guest house total EPI is higher than these figures."
    },
-   "note": "Fake inventory. The corrected figures depend on the ASSUMED COP and on fake operating days and hours."
+   "note": "Sample inventory. The corrected figures depend on the ASSUMED COP and on sample operating days and hours."
   },
   "reduction": {
    "electricity": {
