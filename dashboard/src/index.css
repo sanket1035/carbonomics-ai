@@ -71,7 +71,7 @@ h1, h2 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01
 @keyframes shimmer-move { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 .rise { animation: rise .55s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: var(--d, 0ms); }
 .page-in { animation: rise .45s cubic-bezier(.2, .8, .2, 1) backwards; }
-.shimmer { background: linear-gradient(90deg, #10b981 0%, #6ee7b7 45%, #10b981 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
+.shimmer { background: linear-gradient(90deg, #6ea89e 0%, #cfe5d5 45%, #6ea89e 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
 button:not(:disabled), a.btn { transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease; }
 button:not(:disabled):active { transform: scale(.97); }
 .card { transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease; }
@@ -92,16 +92,17 @@ button:not(:disabled):active { transform: scale(.97); }
   --color-slate-900: #111311;
   --color-slate-800: #1b1e1b;
   --color-slate-950: #0a0b0a;
-  --color-brand-50: #dcfce9;
-  --color-brand-400: #34d399;
-  --color-brand-500: #10b981;
-  --color-brand-600: #059669;
-  --color-brand-700: #047857;
+  --color-brand-50: #e3f0ed;
+  --color-brand-400: #a6d2c8;
+  --color-brand-500: #6ea89e;
+  --color-brand-600: #4c8a7f;
+  --color-brand-700: #36695f;
   --hair: #e3dcc7;
+  --chart-green: #6ea89e;   /* Teal Mist: the green of every chart mark in light mode */
   background-color: var(--color-slate-50);
   background-image: repeating-linear-gradient(135deg, rgba(60, 50, 20, .06) 0 1px, transparent 1px 9px);
 }
-.dark .app-shell { --hair: rgba(255, 255, 255, .09); background-color: var(--color-slate-950); background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 9px); }
+.dark .app-shell { --chart-green: #a6d2c8; --color-brand-500: #a6d2c8; --color-brand-600: #5f9a8f; --hair: rgba(255, 255, 255, .09); background-color: var(--color-slate-950); background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 9px); }
 .app-frame { background-color: var(--color-slate-50); border-inline: 1px solid var(--hair); }
 .dark .app-frame { background-color: var(--color-slate-950); }
 

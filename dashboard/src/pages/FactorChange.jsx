@@ -5,7 +5,7 @@ import { api } from '../api.js'
 import { Callout, Card, Kpi, fmt, useChartTheme } from '../ui.jsx'
 
 const field = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900'
-const GREEN = '#059669', RED = '#e11d48', BASE = '#10b981'
+const GREEN = '#059669', RED = '#e11d48', BASE = 'var(--chart-green)'
 
 // Default grid version for a calendar year: the fiscal year that ends in it (2025 -> 2024-25), else the closest listed.
 const defaultFy = (year, versions) => {
