@@ -348,7 +348,7 @@ function TrainingLog({ tr, chosen, beats }) {
   )
 }
 
-const slider = 'w-full accent-teal-700'
+const slider = 'w-full accent-emerald-500'
 
 function Scenario({ r }) {
   const t = useChartTheme()

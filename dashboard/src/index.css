@@ -71,7 +71,7 @@ h1, h2 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01
 @keyframes shimmer-move { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 .rise { animation: rise .55s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: var(--d, 0ms); }
 .page-in { animation: rise .45s cubic-bezier(.2, .8, .2, 1) backwards; }
-.shimmer { background: linear-gradient(90deg, #0f766e 0%, #5eead4 45%, #0f766e 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
+.shimmer { background: linear-gradient(90deg, #10b981 0%, #6ee7b7 45%, #10b981 90%); background-size: 200% 100%; animation: shimmer-move 1.4s linear infinite; }
 button:not(:disabled), a.btn { transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease; }
 button:not(:disabled):active { transform: scale(.97); }
 .card { transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease; }
@@ -92,11 +92,11 @@ button:not(:disabled):active { transform: scale(.97); }
   --color-slate-900: #111311;
   --color-slate-800: #1b1e1b;
   --color-slate-950: #0a0b0a;
-  --color-brand-50: #e8f7ef;
-  --color-brand-400: #3ddc97;
-  --color-brand-500: #14b87a;
-  --color-brand-600: #0b8a5f;
-  --color-brand-700: #076b49;
+  --color-brand-50: #dcfce9;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
   --hair: #e3dcc7;
   background-color: var(--color-slate-50);
   background-image: repeating-linear-gradient(135deg, rgba(60, 50, 20, .06) 0 1px, transparent 1px 9px);
@@ -106,7 +106,7 @@ button:not(:disabled):active { transform: scale(.97); }
 .dark .app-frame { background-color: var(--color-slate-950); }
 
 @layer components {
-.kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--color-brand-600); }
+.kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--color-brand-700); }
 .dark .app-shell .kicker { color: var(--color-brand-400); }
 }
 .app-shell h1, .app-shell h2 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.02em; }

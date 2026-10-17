@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 export const COLORS = {
-  electricity: '#0f766e',
+  electricity: '#10b981',
   diesel: '#d97706',
   solar: '#ca8a04',
   actual: '#0f172a',

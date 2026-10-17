@@ -136,7 +136,7 @@ function ScopeDonut({ scope1, scope2, label }) {
     <div className="flex flex-col items-center gap-3">
       <div
         className="relative h-28 w-28 rounded-full"
-        style={{ background: `conic-gradient(#0f766e 0deg ${s2Deg}deg, #d97706 ${s2Deg}deg 360deg)` }}
+        style={{ background: `conic-gradient(#10b981 0deg ${s2Deg}deg, #d97706 ${s2Deg}deg 360deg)` }}
         aria-label={`Scope 2: ${s2Pct}%, Scope 1: ${s1Pct}%`}
       >
         <div className="absolute inset-3 flex flex-col items-center justify-center rounded-full bg-white dark:bg-slate-900">
@@ -146,7 +146,7 @@ function ScopeDonut({ scope1, scope2, label }) {
       </div>
       <div className="text-center text-xs font-medium text-slate-600 dark:text-slate-400">{label}</div>
       <div className="flex gap-3 text-xs">
-        <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-teal-700" />Scope 2 {s2Pct}%</span>
+        <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />Scope 2 {s2Pct}%</span>
         <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-amber-600" />Scope 1 {s1Pct}%</span>
       </div>
     </div>
@@ -355,7 +355,7 @@ export default function Simulation({ data }) {
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
                   <Bar animationDuration={900} dataKey="base_total" name="Baseline" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                  <Bar animationDuration={900} dataKey="scen_total" name="Scenario" fill="#0f766e" radius={[4, 4, 0, 0]} />
+                  <Bar animationDuration={900} dataKey="scen_total" name="Scenario" fill="#10b981" radius={[4, 4, 0, 0]} />
                   {!isZero && <ReferenceLine y={0} stroke={t.axis} />}
                 </BarChart>
               </ResponsiveContainer>
@@ -380,7 +380,7 @@ export default function Simulation({ data }) {
                     cursor={{ fill: 'rgba(148,163,184,0.1)' }}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-                  <Bar animationDuration={900} dataKey="scen_scope2" name="Scope 2 (electricity)" fill="#0f766e" stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar animationDuration={900} dataKey="scen_scope2" name="Scope 2 (electricity)" fill="#10b981" stackId="a" radius={[0, 0, 0, 0]} />
                   <Bar animationDuration={900} dataKey="scen_scope1" name="Scope 1 (generator diesel)" fill="#d97706" stackId="a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
