@@ -1,0 +1,95 @@
+{
+  "data": "BDG2 electricity_cleaned.csv (hourly, 2016-2017), metadata.csv; CC BY-SA 4.0",
+  "n_education_buildings_in_file": 604,
+  "n_secondary": 58,
+  "n_primary_strict": 36,
+  "gate_min_improvement": 0.05,
+  "n_sites_secondary": 6,
+  "primary_strict_104_weeks": {
+    "n_buildings": 36,
+    "gate_accepts_ml": 8,
+    "gate_accepts_ml_frac": 0.222,
+    "gate_ci95": [
+      0.117,
+      0.381
+    ],
+    "ml_better_any_margin": 12,
+    "ml_better_any_margin_frac": 0.333,
+    "any_margin_ci95": [
+      0.202,
+      0.497
+    ],
+    "median_mae_ratio_ml_over_naive": 1.111,
+    "q25_q75_mae_ratio": [
+      0.966,
+      1.368
+    ],
+    "median_R2_naive": 0.385,
+    "median_R2_ml_candidate": 0.216,
+    "candidate_model_counts": {
+      "ridge": 22,
+      "random_forest": 10,
+      "xgboost": 4
+    },
+    "mean_MAE_naive_kwh": 2257.8,
+    "mean_MAE_ml_kwh": 2824.7
+  },
+  "secondary_contiguous_ge78_weeks": {
+    "n_buildings": 58,
+    "gate_accepts_ml": 14,
+    "gate_accepts_ml_frac": 0.241,
+    "gate_ci95": [
+      0.15,
+      0.365
+    ],
+    "ml_better_any_margin": 18,
+    "ml_better_any_margin_frac": 0.31,
+    "any_margin_ci95": [
+      0.206,
+      0.438
+    ],
+    "median_mae_ratio_ml_over_naive": 1.119,
+    "q25_q75_mae_ratio": [
+      0.962,
+      1.452
+    ],
+    "median_R2_naive": 0.411,
+    "median_R2_ml_candidate": 0.18,
+    "candidate_model_counts": {
+      "ridge": 35,
+      "random_forest": 16,
+      "xgboost": 7
+    },
+    "mean_MAE_naive_kwh": 1868.5,
+    "mean_MAE_ml_kwh": 2466.5
+  },
+  "secondary_only_extra_buildings": {
+    "n_buildings": 22,
+    "gate_accepts_ml": 6,
+    "gate_accepts_ml_frac": 0.273,
+    "gate_ci95": [
+      0.132,
+      0.482
+    ],
+    "ml_better_any_margin": 6,
+    "ml_better_any_margin_frac": 0.273,
+    "any_margin_ci95": [
+      0.132,
+      0.482
+    ],
+    "median_mae_ratio_ml_over_naive": 1.253,
+    "q25_q75_mae_ratio": [
+      0.949,
+      1.452
+    ],
+    "median_R2_naive": 0.45,
+    "median_R2_ml_candidate": 0.019,
+    "candidate_model_counts": {
+      "ridge": 13,
+      "random_forest": 6,
+      "xgboost": 3
+    },
+    "mean_MAE_naive_kwh": 1231.5,
+    "mean_MAE_ml_kwh": 1880.4
+  }
+}
