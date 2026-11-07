@@ -1,0 +1,68 @@
+{
+  "windows_with_zero_naive_MAE_excluded_from_ratio": 4,
+  "n_buildings": 58,
+  "n_sites": 6,
+  "origin_drop0": {
+    "gate_accept_frac": 0.241,
+    "median_ratio": 1.119,
+    "ratio_lt1_frac": 0.31
+  },
+  "origin_drop10": {
+    "gate_accept_frac": 0.259,
+    "median_ratio": 1.158,
+    "ratio_lt1_frac": 0.375
+  },
+  "origin_drop20": {
+    "gate_accept_frac": 0.31,
+    "median_ratio": 1.051,
+    "ratio_lt1_frac": 0.411
+  },
+  "pooled_gate_accept_frac": 0.27,
+  "pooled_gate_accept_site_cluster_bootstrap_ci95": [
+    0.092,
+    0.491
+  ],
+  "pooled_median_ratio": 1.119,
+  "pooled_median_ratio_site_cluster_bootstrap_ci95": [
+    0.95,
+    1.619
+  ],
+  "buildings_accepting_in_0_1_2_3_origins": [
+    30,
+    14,
+    9,
+    5
+  ],
+  "per_site": {
+    "Fox": {
+      "n_buildings": 6,
+      "gate_accept_frac": 0.389,
+      "median_ratio": 1.051
+    },
+    "Hog": {
+      "n_buildings": 7,
+      "gate_accept_frac": 0.048,
+      "median_ratio": 1.15
+    },
+    "Lamb": {
+      "n_buildings": 19,
+      "gate_accept_frac": 0.053,
+      "median_ratio": 2.14
+    },
+    "Moose": {
+      "n_buildings": 1,
+      "gate_accept_frac": 0.333,
+      "median_ratio": 0.96
+    },
+    "Robin": {
+      "n_buildings": 21,
+      "gate_accept_frac": 0.397,
+      "median_ratio": 0.994
+    },
+    "Wolf": {
+      "n_buildings": 4,
+      "gate_accept_frac": 0.833,
+      "median_ratio": 0.813
+    }
+  }
+}
