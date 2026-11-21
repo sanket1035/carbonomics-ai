@@ -237,6 +237,13 @@ def _report_factor_change(periods: list) -> Optional[dict]:
         return None
 
 
+class ScenarioIn(BaseModel):
+    """The what-if scenario saved on the Simulation page for the file being reported (same bounds as /api/simulate)."""
+    electricity_change_pct: float = Field(0.0, ge=-100, le=100)
+    diesel_change_pct: float = Field(0.0, ge=-100, le=100)
+    solar_offset_kwh_per_period: float = Field(0.0, ge=0)
+
+
 class ReportRequest(BaseModel):
     periods: List[Period] = Field(min_length=1, max_length=upload_analysis.MAX_SIM_PERIODS)
     granularity: str = Field(max_length=10)
@@ -244,6 +251,7 @@ class ReportRequest(BaseModel):
     prepared_for: str = Field("", max_length=200)
     budget_inr: Optional[float] = None       # with measures: adds the Optimization and Recommended steps pages
     measures: List[MeasureIn] = Field(default_factory=list, max_length=upload_optimization.MAX_MEASURES)
+    scenario: Optional[ScenarioIn] = None    # adds "Your what-if scenario" (the Simulation page scenario saved for this file)
     include_campus_inventory: bool = True    # yearly Scope 1, 2 and 3 pages and the Energy Audit pages (KKWIEER master data), static
 
 
@@ -290,13 +298,20 @@ def report(req: ReportRequest, user: User = Depends(current_user)) -> Response:
             plan = upload_optimization.optimize_upload(periods, req.granularity, req.budget_inr, [m.model_dump() for m in req.measures])
         except upload_analysis.UploadError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+    scenario = None
+    if req.scenario is not None:
+        try:
+            scenario = upload_analysis.simulate_upload(periods, **req.scenario.model_dump())
+        except upload_analysis.UploadError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
     audit = _report_energy_audit() if req.include_campus_inventory else None
     today = date.today()
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "report.pdf")
         build_full_report(path, analysis, plan, None, prepared_for=req.prepared_for, data_source=req.file_name,
                           generated_on=f"{today.day} {today.strftime('%B %Y')}",
-                          inventory=campus_footprint_report.load_report() if req.include_campus_inventory else None, energy_audit=audit)
+                          inventory=campus_footprint_report.load_report() if req.include_campus_inventory else None, energy_audit=audit,
+                          scenario=scenario)
         pdf = open(path, "rb").read()
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="carbon-footprint-report.pdf"'})
 

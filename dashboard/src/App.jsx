@@ -61,6 +61,15 @@ const writePlan = (p) => {
   try { p ? sessionStorage.setItem(PLAN_KEY, JSON.stringify(p)) : sessionStorage.removeItem(PLAN_KEY) } catch { /* storage blocked: fine */ }
 }
 
+// The what-if scenario saved on the Simulation page, for the file being analysed only. It goes into the PDF report.
+const SCENARIO_KEY = 'carbonomics-last-scenario'
+const readScenario = () => {
+  try { return JSON.parse(sessionStorage.getItem(SCENARIO_KEY)) } catch { return null }
+}
+const writeScenario = (v) => {
+  try { v ? sessionStorage.setItem(SCENARIO_KEY, JSON.stringify(v)) : sessionStorage.removeItem(SCENARIO_KEY) } catch { /* storage blocked: fine */ }
+}
+
 export default function App() {
   const [{ route, next }, setRoute] = useState(parseHash)
   const [dark, setDark] = useState(readTheme)
@@ -105,6 +114,8 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const [analysis, setAnalysis] = useState(readSaved)   // { result, fileName } of the file the user analysed or opened from History
   const [plan, setPlanState] = useState(readPlan)  // optimization inputs, added to the PDF report
   const setPlan = (p) => { setPlanState(p); writePlan(p) }
+  const [scenario, setScenarioState] = useState(readScenario)  // saved Simulation scenario, added to the PDF report
+  const setScenario = (v) => { setScenarioState(v); writeScenario(v) }
   const mine = Boolean(session) && !demo                    // logged-in users see their own data, visitors see the sample demo
 
   useEffect(() => {
@@ -121,7 +132,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
   const current = PAGES.find((p) => p.id === page) ?? PAGES[0]
   const Page = current.C
   const needsData = current.needsData !== false && !mine
-  const showResult = (result, fileName) => { setAnalysis({ result, fileName }); setPlan(null); writeSaved({ result, fileName }) }
+  const showResult = (result, fileName) => { setAnalysis({ result, fileName }); setPlan(null); setScenario(null); writeSaved({ result, fileName }) }
   // Opening a saved analysis brings back the newest optimization plan saved for it, so the report includes it again.
   const restorePlan = async (runId) => {
     try {
@@ -171,7 +182,7 @@ function Dashboard({ page, demo, dark, setDark, session, profile, loggedIn }) {
               {needsData && !error && !data && <div className="muted text-sm">Loading…</div>}
               {needsData && data && <Page data={data} />}
               {mine && current.demo && !analysis && <div className="card text-sm">Upload a file first, then the results appear here. <a className="underline" href="#upload">Go to Upload</a></div>}
-              {mine && current.demo && analysis && <MyPage a={analysis} plan={plan} onPlan={setPlan} />}
+              {mine && current.demo && analysis && <MyPage a={analysis} plan={plan} onPlan={setPlan} scenario={scenario} onScenario={setScenario} />}
               {!mine && !needsData && <Page />}
               {mine && !current.demo && <Page analysis={analysis} onResult={showResult} onOpenAnalysis={openAnalysis} />}
             </main>

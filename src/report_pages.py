@@ -550,9 +550,10 @@ def _factor_text(analysis: dict) -> str:
 
 def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = None, scope3: Optional[dict] = None,
                       prepared_for: str = "", data_source: str = "", generated_on: str = "",
-                      inventory: Optional[dict] = None, energy_audit: Optional[dict] = None) -> str:
+                      inventory: Optional[dict] = None, energy_audit: Optional[dict] = None,
+                      scenario: Optional[dict] = None) -> str:
     """Cover, About, At a glance, Method, Results, the yearly campus footprint (when `inventory` is given), Trend, Sources, Forecast and Training (when forecast ran), What-if,
-    Grid factor, plus Optimization and Recommended steps when a plan is given, then Data and limits.
+    Your saved what-if scenario (when `scenario`, a simulate_upload() result, is given), Grid factor, plus Optimization and Recommended steps when a plan is given, then Data and limits.
     With `energy_audit` (energy_audit.build_audit) the campus Energy Audit pages follow the yearly campus pages: result, AC check, suggestions.
     Every page after the cover has a border."""
     from report_cover import CoverInfo, ReportDetails, draw_cover, draw_details_page
@@ -618,9 +619,14 @@ def build_full_report(path: str, analysis: dict, optimization: Optional[dict] = 
         n += 1
     rx.draw_sensitivity_page(c, analysis, n)
     c.showPage()
-    rx.draw_factor_page(c, analysis, n + 1, analysis.get("factor_change"))
+    n += 1
+    if scenario:
+        rx.draw_scenario_page(c, scenario, inp["granularity_analysed"], n)
+        c.showPage()
+        n += 1
+    rx.draw_factor_page(c, analysis, n, analysis.get("factor_change"))
     c.showPage()
-    n += 2
+    n += 1
     if optimization:
         draw_optimization_page(c, optimization, n)
         c.showPage()
