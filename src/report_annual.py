@@ -1,7 +1,7 @@
 """
 report_annual.py
 
-Two report pages with the yearly campus footprint (Scope 1, 2 and 3), drawn from annual_inventory.load_inventory().
+Two report pages with the yearly campus footprint (Scope 1, 2 and 3), drawn from annual_inventory.load_inventory() or campus_footprint_report.load_report() (same keys).
 
 Nothing is computed here except what the inventory already holds: the figures are fixed yearly totals, so there is
 no chart over time and no forecast. Pages: "Full campus footprint" (totals and every source) and
@@ -37,7 +37,7 @@ def draw_campus_page(c: canvas.Canvas, inv: dict, page_no: int) -> float:
     _fonts()
     _page_header(c, page_no)
     y = _title(c, "Full campus footprint",
-               f"Yearly totals for {inv['period']} from the campus master data. Fixed yearly figures, not forecasts.")
+               f"Yearly totals for {inv['period']} from the published campus report. Fixed yearly figures, not forecasts.")
     total = inv["total"]
     c.setFillColor(HexColor("#ecfdf5"))
     c.setStrokeColor(HexColor("#99f6e4"))
@@ -85,7 +85,7 @@ def draw_campus_page(c: canvas.Canvas, inv: dict, page_no: int) -> float:
                      _fmt(r["tco2e"], 2) if r["tco2e"] is not None else "not measured"))
     rows.append(("Total", "", "", "", _fmt(total, 2)))
     y = _table(c, y, ("Scope", "Source", "Activity", "Factor", "tCO₂e"), rows, (44, 136, 108, 140, RIGHT - LEFT - 428), size=8.5)
-    y = _howto(c, "emission = activity × factor. Rows with '-' are yearly estimates carried over from the master data (next page).", y + 4)
+    y = _howto(c, "emission = activity × factor. Rows with '-' are yearly figures carried over from the campus report (next page).", y + 4)
 
     y = _h2(c, "Emission factors used", y - 4)
     seen, frows = set(), []

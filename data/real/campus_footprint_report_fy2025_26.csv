@@ -1,0 +1,10 @@
+scope,source,activity_value,activity_unit,factor_key,tco2e,basis,note,report_location
+Scope 1,Diesel generator,4100,litres,diesel,11.85,Energy team log,Jan-Dec 2025 monthly records,Table 5.2 / Table D.1
+Scope 1,College bus fleet,43750,litres,diesel,126.44,Transport team records,7 buses x 25 L/day x 250 days,Table 5.2
+Scope 2,Purchased electricity,1059147,kWh,electricity,751.99,Energy team log,Jan-Dec 2025 monthly records,Table 5.4 / Table D.1
+Scope 3,Student commuting,,,,992.35,Student survey,"907 valid responses scaled by 8,633 / 907 = 9.51819; per-mode factors are those of the report's Table 4.4, not itemised here",Table 5.5
+Scope 3,Solid waste,,,,59.50,Estimate,"Midpoint of 56-63 tCO2e a year; waste is recorded only as ranges (760-845 kg/day), so it is not recomputed",Section 5.4.2
+Scope 3,Organised field and technical visits,2447200,passenger-km,bus_intracity,37.10,College records,327 bookings; 532 buses x 115 km x 40 passengers; distance and occupancy are institutional assumptions,Section 5.4.3
+Scope 3,Local business travel,75000,km,diesel_vehicle,12.83,Transport dept records,500 visits x 150 km round trip,Section 5.4.4
+Memo,Rooftop solar avoided emissions,21720,kWh,electricity,15.42,Metered solar,Mar 2025-Feb 2026; avoided emissions are not subtracted from Scope 2,Table 5.4
+Memo,Campus trees (carbon removal),,,,24.79,Estimate,"1,036 trees of 44 species; Forest Survey of India biomass equations; not subtracted from the total",Section 5.5

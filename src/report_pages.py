@@ -196,7 +196,7 @@ def draw_glance_page(c: canvas.Canvas, analysis: dict, scope3: Optional[dict] = 
     notes = []
     if inventory:
         notes.append("The weekly figures on this page cover generator diesel and electricity only. Scope 3 and the rest of "
-                     "Scope 1 (college buses, wastewater) are yearly totals on the 'Full campus footprint' page.")
+                     "Scope 1 (college buses) are yearly totals on the 'Full campus footprint' page.")
     elif not scope3:
         notes.append("Scope 3 is not included in this report because no data for it was provided.")
     else:
