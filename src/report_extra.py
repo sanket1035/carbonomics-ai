@@ -347,6 +347,39 @@ def draw_training_page(c: canvas.Canvas, analysis: dict, page_no: int) -> None:
 
 
 # ── Sensitivity ───────────────────────────────────────────────────────────────
+def draw_scenario_page(c: canvas.Canvas, sim: dict, granularity: str, page_no: int) -> None:
+    """The what-if scenario the user saved for this file (simulate_upload() result): their inputs, baseline against scenario."""
+    _fonts()
+    _page_header(c, page_no)
+    y = _title(c, "Your what-if scenario", "The scenario you saved for this file, against the file as uploaded.")
+    inp, t, srcs = sim["inputs"], sim["totals"], sim["sources_simulated"]
+    unit = "month" if granularity == "monthly" else "week"
+    y = _h2(c, "Changes you chose", y)
+    rows = []
+    if "electricity_kwh" in srcs:
+        rows.append(("Electricity use", f"{inp['electricity_change_pct']:+g}%"))
+        rows.append((f"Solar offset (kWh per {unit})", _fmt(inp["solar_offset_kwh_per_period"], 0)))
+    if "diesel_litres" in srcs:
+        rows.append(("Diesel use", f"{inp['diesel_change_pct']:+g}%"))
+    y = _table(c, y, ("Input", "Value"), rows, (260, WIDTH - 260), size=10)
+    y = _h2(c, "Result for the whole period (tCO2e)", y - 6)
+    rows = []
+    if "electricity_kwh" in srcs:
+        rows.append(("Scope 2 (electricity)", _fmt(t["baseline_scope2_tco2e"], 2), _fmt(t["scenario_scope2_tco2e"], 2),
+                     _fmt(t["baseline_scope2_tco2e"] - t["scenario_scope2_tco2e"], 2)))
+    if "diesel_litres" in srcs:
+        rows.append(("Scope 1 (generator diesel)", _fmt(t["baseline_scope1_tco2e"], 2), _fmt(t["scenario_scope1_tco2e"], 2),
+                     _fmt(t["baseline_scope1_tco2e"] - t["scenario_scope1_tco2e"], 2)))
+    rows.append(("Total", _fmt(t["baseline_total_tco2e"], 2), _fmt(t["scenario_total_tco2e"], 2), _fmt(t["saved_tco2e"], 2)))
+    y = _table(c, y, ("Source", "Baseline", "Scenario", "Saved"), rows, (190, 100, 100, WIDTH - 390), size=10)
+    y = _howto(c, f"the scenario saves {_fmt(t['saved_tco2e'], 2)} tCO₂e, which is {_fmt(t['saved_pct'], 1)}% of the baseline "
+                  f"({_fmt(t['baseline_total_tco2e'], 2)} tCO₂e).", y + 4)
+    y = _h2(c, "Emission factors used", y - 4)
+    frows = [(f["activity"].replace("_", " "), str(f["factor"]), f["output"], f["version"]) for f in sim["factors_used"]]
+    y = _table(c, y, ("Activity", "Factor", "Unit", "Version"), frows, (110, 60, 110, WIDTH - 280), size=9)
+    _para(c, sim["note"], y - 4, 9.5, MUTED)
+
+
 def draw_sensitivity_page(c: canvas.Canvas, analysis: dict, page_no: int) -> None:
     _fonts()
     _page_header(c, page_no)

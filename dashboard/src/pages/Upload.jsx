@@ -110,7 +110,7 @@ function Done({ a }) {
   )
 }
 
-function ReportButton({ r, fileName, plan }) {
+function ReportButton({ r, fileName, plan, scenario }) {
   const { profile, session } = useAuth()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -122,7 +122,7 @@ function ReportButton({ r, fileName, plan }) {
       const who = [profile?.full_name || session?.email, profile?.role && profile.role !== 'other' ? profile.role : ''].filter(Boolean).join(', ')
       const file = await api('/api/report', { method: 'POST', blob: true, json: {
         periods: accounting.periods.map((p) => ({ period_start: p.period_start, electricity_kwh: p.electricity_kwh, diesel_litres: p.diesel_litres })),
-        granularity: input.granularity_analysed, file_name: input.file_name || fileName || '', prepared_for: who, ...(plan ?? {}),
+        granularity: input.granularity_analysed, file_name: input.file_name || fileName || '', prepared_for: who, ...(plan ?? {}), ...(scenario ? { scenario } : {}),
       } })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(file); a.download = 'carbon-footprint-report.pdf'; a.click()
@@ -134,7 +134,10 @@ function ReportButton({ r, fileName, plan }) {
       <button disabled={busy} onClick={download} className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-50">
         {busy ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Download report (PDF)
       </button>
-      <span className="muted text-xs">{plan ? 'Includes your optimization plan and recommended steps.' : 'Run "Find best plan" on the Optimization page to add the plan and recommended steps.'}</span>
+      <span className="muted text-xs">
+        {plan ? 'Includes your optimization plan and recommended steps.' : 'Run "Find best plan" on the Optimization page to add the plan and recommended steps.'}{' '}
+        {scenario ? 'Includes your saved what-if scenario.' : 'Press "Save this scenario" on the Simulation page to add your what-if scenario.'}
+      </span>
       {error && <span className="text-xs text-rose-600">{error}</span>}
     </div>
   )
@@ -193,14 +196,14 @@ function CampusAnnual() {
   )
 }
 
-export function MyOverview({ a, plan }) {
+export function MyOverview({ a, plan, scenario }) {
   const r = a.result
   const { input, accounting, factors_used: factors } = r
   const tot = accounting.totals
   return (
     <div className="space-y-6">
       <SavedNote run={r.run} />
-      <ReportButton r={r} fileName={a.fileName} plan={plan} />
+      <ReportButton r={r} fileName={a.fileName} plan={plan} scenario={scenario} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="Total emission" value={fmt(tot.total_tco2e, 2)} unit="tCO₂e" sub={`${input.period_start} to ${input.period_end}`} badge={<YourData />} />
         <Kpi label="Scope 2 (electricity)" value={fmt(tot.scope2_tco2e, 2)} unit="tCO₂e" sub="activity x grid factor" />
@@ -269,17 +272,23 @@ export function MyForecast({ a }) {
   return <Forecast forecast={forecast} t={t} />
 }
 
-export function MySimulation({ a }) {
-  return Array.isArray(a.result.accounting.periods) ? <Scenario r={a.result} /> : needPeriods('the what-if scenario')
+export function MySimulation({ a, plan, scenario, onScenario }) {
+  if (!Array.isArray(a.result.accounting.periods)) return needPeriods('the what-if scenario')
+  return (
+    <div className="space-y-6">
+      <Scenario r={a.result} scenario={scenario} onScenario={onScenario} />
+      <ReportButton r={a.result} fileName={a.fileName} plan={plan} scenario={scenario} />
+    </div>
+  )
 }
 
-export function MyOptimization({ a, plan, onPlan }) {
+export function MyOptimization({ a, plan, onPlan, scenario }) {
   const r = a.result
   if (!Array.isArray(r.accounting.periods)) return needPeriods('the optimization')
   return (
     <div className="space-y-6">
       <OptimizeCard r={r} onPlan={onPlan} />
-      <ReportButton r={r} fileName={a.fileName} plan={plan} />
+      <ReportButton r={r} fileName={a.fileName} plan={plan} scenario={scenario} />
     </div>
   )
 }
@@ -402,13 +411,13 @@ function TrainingLog({ tr, chosen, beats }) {
 
 const slider = 'w-full accent-[var(--chart-green)]'
 
-function Scenario({ r }) {
+function Scenario({ r, scenario, onScenario }) {
   const t = useChartTheme()
   const { input, accounting } = r
   const hasDiesel = 'diesel_litres' in accounting.periods[0]
   const hasElec = 'electricity_kwh' in accounting.periods[0]
   const unit = input.granularity_analysed === 'monthly' ? 'month' : 'week'
-  const [sc, setSc] = useState({ e: 0, d: 0, s: 0 })
+  const [sc, setSc] = useState(scenario ? { e: scenario.electricity_change_pct, d: scenario.diesel_change_pct, s: scenario.solar_offset_kwh_per_period } : { e: 0, d: 0, s: 0 })   // reopening the page shows the scenario saved for this file
   const [sim, setSim] = useState(null)
   const [err, setErr] = useState('')
   const [saveState, setSaveState] = useState(null)   // null | 'saving' | { ok, message }
@@ -416,12 +425,14 @@ function Scenario({ r }) {
   const periodsBody = () => accounting.periods.map((p) => ({ period_start: p.period_start, electricity_kwh: p.electricity_kwh, diesel_litres: p.diesel_litres }))
   const save = async () => {
     setSaveState('saving')
+    // The report uses the scenario saved for this file, whether or not the history save below works.
+    onScenario?.({ electricity_change_pct: sc.e, diesel_change_pct: sc.d, solar_offset_kwh_per_period: sc.s })
     try {
       const res = await api('/api/simulate', { method: 'POST', json: {
         periods: periodsBody(), electricity_change_pct: sc.e, diesel_change_pct: sc.d, solar_offset_kwh_per_period: sc.s,
         save: true, title: `Scenario: ${r.run?.title || input.period_start + ' to ' + input.period_end}`, parent_run_id: r.run?.id ?? null,
       } })
-      setSaveState(res.run?.saved ? { ok: true, message: 'Scenario saved to your history.' } : { ok: false, message: res.run?.error || 'History is not available, so the scenario was not saved.' })
+      setSaveState(res.run?.saved ? { ok: true, message: 'Scenario saved to your history.' } : { ok: false, message: res.run?.error || 'History is not available, so it was not saved there. It is still used in the PDF report.' })
     } catch (e) { setSaveState({ ok: false, message: e.message }) }
   }
   useEffect(() => { setSaveState(null) }, [sc])
