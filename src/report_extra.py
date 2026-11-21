@@ -443,8 +443,7 @@ def draw_notes_page(c: canvas.Canvas, analysis: dict, page_no: int, scope3: Opti
     ] + ([
         "WRI, TERI, CII, India GHG Program (2015), road transport emission factors.",
         "UK DEFRA greenhouse gas conversion factors (2024), diesel passenger vehicle.",
-        "IPCC 2019 Refinement to the 2006 Guidelines, domestic wastewater (Tier 1).",
-        "KKWIEER Carbon Footprint Master Data FY 2025-26, and the college survey carried out by the Young Indians team.",
+        "KKWIEER Carbon Footprint Report FY2025-26 (Young Indians KKWIEER Chapter); Scope 3 data from the college survey carried out by the Young Indians team.",
     ] if inventory else []) + ([
         f"{r['source']} ({r['version']})." for r in energy_audit["references"]
     ] + ["Sources for each Energy Audit suggestion are given on the suggestion pages."] if energy_audit else []), y, 9.5)

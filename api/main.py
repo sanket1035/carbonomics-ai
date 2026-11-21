@@ -4,6 +4,7 @@ Carbonomics-AI web API.
 POST /api/analyze  - upload a CSV, get validation, carbon accounting and a forecast as JSON.
 POST /api/simulate - what-if scenario on the periods returned by /api/analyze.
 POST /api/factor-change - why emissions changed between two years: your energy use vs the grid factor.
+GET  /api/campus-footprint - the yearly Scope 1, 2 and 3 footprint of the published campus report (static, not forecast).
 GET  /api/grid-factors - the documented grid-factor versions the user can pick from.
 POST /api/optimize - best measures within a budget, from the user's own cost inputs.
 POST /api/report   - the PDF report, rebuilt on the server from the periods (and plan inputs) of the user's analysis.
@@ -31,7 +32,7 @@ from pydantic import BaseModel, Field
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(os.path.join(ROOT, "src"))
 
-import annual_inventory  # noqa: E402
+import campus_footprint_report  # noqa: E402
 import emission_factors  # noqa: E402
 import energy_audit  # noqa: E402
 import factor_change  # noqa: E402
@@ -136,6 +137,15 @@ class FactorChangeRequest(BaseModel):
     year_b: Optional[int] = None
     fy_a: Optional[str] = Field(None, max_length=10)
     fy_b: Optional[str] = Field(None, max_length=10)
+
+
+@app.get("/api/campus-footprint")
+def campus_footprint(user: User = Depends(current_user)) -> dict:
+    """Yearly campus footprint (FY 2025-26) incl. Scope 3, shown next to, never added to, the user's own totals."""
+    try:
+        return campus_footprint_report.load_report()
+    except campus_footprint_report.ReportError as exc:
+        raise HTTPException(status_code=500, detail=f"Campus footprint file is inconsistent: {exc}") from exc
 
 
 @app.get("/api/grid-factors")
@@ -286,7 +296,7 @@ def report(req: ReportRequest, user: User = Depends(current_user)) -> Response:
         path = os.path.join(tmp, "report.pdf")
         build_full_report(path, analysis, plan, None, prepared_for=req.prepared_for, data_source=req.file_name,
                           generated_on=f"{today.day} {today.strftime('%B %Y')}",
-                          inventory=annual_inventory.load_inventory() if req.include_campus_inventory else None, energy_audit=audit)
+                          inventory=campus_footprint_report.load_report() if req.include_campus_inventory else None, energy_audit=audit)
         pdf = open(path, "rb").read()
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="carbon-footprint-report.pdf"'})
 

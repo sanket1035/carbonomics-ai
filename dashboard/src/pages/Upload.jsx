@@ -142,6 +142,57 @@ function ReportButton({ r, fileName, plan }) {
 
 const needPeriods = (what) => <Callout tone="blue" title="Per-period detail not available">This run was opened from your history as a summary only, so {what} is not available. Upload the file again to see it.</Callout>
 
+
+// Yearly Scope 1, 2 and 3 of the published campus report. Shown next to the user's own totals, never added to them.
+function CampusAnnual() {
+  const [d, setD] = useState(null)
+  useEffect(() => {
+    let live = true
+    api('/api/campus-footprint').then((x) => { if (live) setD(x) }).catch(() => {})   // the card is optional: hide it if the server cannot give it
+    return () => { live = false }
+  }, [])
+  if (!d) return null
+  const rows = d.rows.filter((r) => r.scope !== 'Memo')
+  return (
+    <Card title={`Full campus footprint, ${d.period} (yearly, with Scope 3)`} subtitle="Fixed yearly figures from the published campus report. Not forecast and not part of your uploaded totals above." badge={<Badge tone="slate">REPORT FIGURES</Badge>}>
+      <div className="mb-4 grid gap-3 sm:grid-cols-4">
+        {['Scope 1', 'Scope 2', 'Scope 3'].map((s) => (
+          <div key={s} className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+            <div className="muted font-mono text-[10.5px] uppercase tracking-[.08em]">{s}</div>
+            <div className="text-xl font-semibold tabular-nums">{fmt(d.by_scope[s], 2)} <span className="muted text-xs font-normal">tCO₂e</span></div>
+          </div>
+        ))}
+        <div className="rounded-xl border border-brand-600/40 bg-brand-50 p-3 dark:bg-slate-800/60">
+          <div className="muted font-mono text-[10.5px] uppercase tracking-[.08em]">Total</div>
+          <div className="text-xl font-semibold tabular-nums">{fmt(d.total, 2)} <span className="muted text-xs font-normal">tCO₂e</span></div>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead><tr className="muted border-b border-slate-200 text-left text-xs uppercase tracking-wide dark:border-slate-800">
+            <th className="py-2 pr-4">Scope</th><th className="py-2 pr-4">Source</th><th className="py-2 pr-4">Basis</th><th className="py-2 text-right">tCO₂e</th>
+          </tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.source} className="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                <td className="py-2 pr-4">{r.scope}</td>
+                <td className="py-2 pr-4 font-medium">{r.source}</td>
+                <td className="muted py-2 pr-4 text-xs">{r.basis}, {r.report_location}</td>
+                <td className="py-2 text-right tabular-nums">{fmt(r.tco2e, 2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="muted mt-3 text-xs">
+        Scope 3 data comes from {d.scope3_source}. Source: {d.source}. Rooftop solar avoided
+        ({fmt(d.memo.find((m) => m.source.startsWith('Rooftop'))?.tco2e, 2)} tCO₂e) and tree removals
+        ({fmt(d.memo.find((m) => m.source.startsWith('Campus trees'))?.tco2e, 2)} tCO₂e) are reported separately and not subtracted.
+      </p>
+    </Card>
+  )
+}
+
 export function MyOverview({ a, plan }) {
   const r = a.result
   const { input, accounting, factors_used: factors } = r
@@ -177,6 +228,7 @@ export function MyOverview({ a, plan }) {
           </table>
         </div>
       </Card>
+      <CampusAnnual />
       <p className="muted text-xs">{r.disclaimer}</p>
     </div>
   )
